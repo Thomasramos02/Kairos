@@ -1,0 +1,19 @@
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+
+export default function TermsPage() {
+  return (
+    <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center p-6">
+      <div className="glass-card rounded-xl p-8">
+        <h1 className="text-3xl font-bold text-foreground">Terms of Service</h1>
+        <p className="mt-4 text-muted-foreground">
+          Kairos is presented here as a prototype. The production product should prohibit spam,
+          abusive automation, and misuse of public business records.
+        </p>
+        <Button asChild className="mt-6">
+          <Link href="/">Back to home</Link>
+        </Button>
+      </div>
+    </main>
+  )
+}
