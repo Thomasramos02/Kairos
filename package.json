@@ -2,8 +2,8 @@
   "name": "kairos-monorepo",
   "private": true,
   "scripts": {
-    "postinstall": "npm install --prefix kairosBack && npm install --prefix kairosFront",
-    "build": "npm run build --prefix kairosBack && npm run build --prefix kairosFront",
+    "postinstall": "cd kairosBack && npm install && cd ../kairosFront && npm install",
+    "build": "cd kairosBack && npm run build && cd ../kairosFront && npm run build",
     "start": "cd kairosBack && npm run db:migrate && node dist/main"
   },
   "devDependencies": {
