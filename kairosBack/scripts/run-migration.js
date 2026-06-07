@@ -1,9 +1,15 @@
-const { readdirSync, readFileSync } = require('fs');
+const { readdirSync, readFileSync, existsSync } = require('fs');
 const { join } = require('path');
 const { Pool } = require('pg');
 
 function loadEnvironmentFile() {
   const environmentPath = join(__dirname, '..', '.env');
+  
+  if (!existsSync(environmentPath)) {
+    console.log('No .env file found, relying on system environment variables.');
+    return;
+  }
+
   const environmentFile = readFileSync(environmentPath, 'utf8');
 
   for (const line of environmentFile.split(/\r?\n/)) {

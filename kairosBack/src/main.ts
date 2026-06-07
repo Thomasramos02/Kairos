@@ -6,6 +6,7 @@ async function bootstrap(): Promise<void> {
   const kairosEnvironment = readKairosEnvironment(process.env);
   const application = await NestFactory.create(AppModule);
 
+  application.enableCors();
   application.enableShutdownHooks();
   await application.listen(kairosEnvironment.port);
 }
