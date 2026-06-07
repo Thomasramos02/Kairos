@@ -1,17 +1,16 @@
 services:
-  # Backend API and Workers
+  # Monolith: Backend + Frontend + Workers
   - type: web
-    name: kairos-backend
+    name: kairos-app
     runtime: node
-    rootDir: kairosBack
     plan: starter
     buildCommand: npm install && npm run build
-    startCommand: npm run db:migrate && node dist/main
+    startCommand: npm run start
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 3001
+        value: 10000
       - key: DATABASE_URL
         fromDatabase:
           name: kairos-db
@@ -25,21 +24,8 @@ services:
         generateValue: true
       - key: OUTBOX_POLL_INTERVAL_MS
         value: 5000
-
-  # Frontend Application
-  - type: web
-    name: kairos-frontend
-    runtime: node
-    rootDir: kairosFront
-    plan: starter
-    buildCommand: npm install && npm run build
-    startCommand: npm run start
-    envVars:
       - key: NEXT_PUBLIC_KAIROS_API_URL
-        fromService:
-          type: web
-          name: kairos-backend
-          property: url
+        value: "/kairos-api"
 
 databases:
   - name: kairos-db
@@ -48,10 +34,8 @@ databases:
     plan: starter
     postgresMajorVersion: 17
 
-# Redis (Render's Redis is compatible with Valkey)
-# Note: Render Redis doesn't have a specific Valkey type, we use redis.
 redis:
   - name: kairos-redis
     plan: starter
     maxmemoryPolicy: allkeys-lru
-    ipAllowList: [] # Only allow internal connections
+    ipAllowList: []

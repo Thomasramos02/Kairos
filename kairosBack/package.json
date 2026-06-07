@@ -21,6 +21,7 @@
     "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
+    "@nestjs/serve-static": "^5.0.0",
     "bullmq": "^5.0.0",
     "drizzle-orm": "^0.38.0",
     "pg": "^8.13.0",
