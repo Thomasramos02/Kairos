@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 const companies = [
   {
     name: 'Bright Smile Dental LLC',
-    market: 'Miami, FL',
+    market: 'Hartford, CT',
     industry: 'Healthcare - Dental',
     age: '27 days',
     score: 87,
@@ -16,7 +16,7 @@ const companies = [
   },
   {
     name: 'Peak Fitness Studio LLC',
-    market: 'Tampa, FL',
+    market: 'New Haven, CT',
     industry: 'Fitness & Wellness',
     age: '35 days',
     score: 78,
@@ -26,7 +26,7 @@ const companies = [
   },
   {
     name: 'Nova Clean Services LLC',
-    market: 'Orlando, FL',
+    market: 'Stamford, CT',
     industry: 'Cleaning Services',
     age: '14 days',
     score: 62,
@@ -69,7 +69,7 @@ export function DashboardSection() {
 
             <Button className="mt-8 gap-2" asChild>
               <Link href="/dashboard">
-                View dashboard prototype
+                View dashboard
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
@@ -82,7 +82,7 @@ export function DashboardSection() {
                   <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
                     Today&apos;s outreach timing
                   </p>
-                  <h3 className="mt-1 text-xl font-semibold text-foreground">Florida, United States</h3>
+                  <h3 className="mt-1 text-xl font-semibold text-foreground">Connecticut, United States</h3>
                 </div>
                 <div className="flex gap-2">
                   <button className="inline-flex h-9 items-center gap-2 rounded-md border border-border px-3 text-sm text-muted-foreground">

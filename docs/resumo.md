@@ -10,6 +10,10 @@ Frase central do produto:
 
 **Descubra empresas novas cedo. Aborde no momento certo.**
 
+Frase em ingles para a interface:
+
+**Discover new businesses early. Reach out when timing is right.**
+
 ## 2. Problema Que O Produto Resolve
 
 Times comerciais gastam tempo demais procurando leads e pouco tempo atuando no momento certo.
@@ -21,7 +25,7 @@ O mercado atual costuma oferecer:
 - sinais isolados, sem leitura temporal;
 - abordagens frias em contatos que ainda nao estao prontos.
 
-O Kairos resolve esse problema ao combinar descoberta antecipada com leitura de fase comercial.
+O Kairos resolve esse problema ao combinar descoberta antecipada, sinais de oportunidade e leitura de fase comercial.
 
 ## 3. Hipotese Do Produto
 
@@ -29,9 +33,10 @@ A hipotese do Kairos e simples:
 
 1. Empresas novas podem ser boas oportunidades.
 2. O timing de abordagem importa tanto quanto a descoberta.
-3. A melhor janela pode acontecer semanas depois do registro, nao necessariamente no primeiro dia.
+3. Relevancia importa mais que chegar primeiro.
+4. A melhor janela pode acontecer semanas depois do registro, nao necessariamente no primeiro dia.
 
-O produto nao promete prever compra. Ele ajuda o usuario a entender se a empresa parece pronta para receber uma abordagem mais contextual.
+O produto nao promete prever compra. Ele ajuda o usuario a responder quando a solucao que ele vende parece se tornar relevante para aquela empresa.
 
 ## 4. Para Quem E
 
@@ -50,6 +55,7 @@ Esses perfis se beneficiam porque costumam valorizar empresas novas, proximas de
 O Kairos entrega tres coisas ao mesmo tempo:
 
 - descoberta antecipada;
+- sinais iniciais de oportunidade;
 - acompanhamento da evolucao da empresa;
 - indicacao de janela comercial.
 
@@ -67,7 +73,7 @@ O Kairos responde:
 
 - quais empresas nasceram recentemente;
 - em que fase estao;
-- quando vale abordar;
+- quando a oferta do usuario parece mais relevante;
 - por que essa recomendacao existe.
 
 ## 7. Mercado Inicial
@@ -77,9 +83,15 @@ A validacao inicial aponta maior aderencia no mercado internacional, especialmen
 Direcao inicial:
 
 - interface em ingles;
-- foco em um estado americano por vez;
-- filtros por estado, cidade e segmento;
+- Connecticut como cobertura ativa inicial;
+- Rhode Island como proxima cobertura candidata;
+- Florida, Seattle, Oregon e Iowa como experimentos separados;
+- filtros por estado, cidade e segmento conforme confiabilidade da fonte;
 - comunicacao voltada a prospeccao B2B.
+
+Posicionamento do beta:
+
+**Kairos Beta prioritizes Connecticut for industry-aware timing scores. Rhode Island is next; Florida, Seattle, Oregon, and Iowa are experimental coverage.**
 
 ## 8. O Que Esta Dentro Do Produto
 
@@ -97,6 +109,9 @@ O produto deve cobrir:
 
 O produto nao deve tentar ser, no MVP:
 
+- uma Econodata menor;
+- um Apollo menor;
+- um ZoomInfo menor;
 - uma base generica com filtros infinitos;
 - uma plataforma de disparo em massa;
 - um CRM completo;

@@ -12,7 +12,7 @@ export default function DashboardPage() {
         </p>
         </div>
         <div className="rounded-lg border border-border bg-card px-3 py-2 text-sm text-muted-foreground">
-          Market: <span className="font-medium text-foreground">Florida, United States</span>
+          Coverage: <span className="font-medium text-foreground">Connecticut active</span>
         </div>
       </div>
 

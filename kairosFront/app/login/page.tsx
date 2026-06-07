@@ -8,6 +8,8 @@ import { AlertCircle, ArrowRight, Bell, Clock3, Eye, EyeOff, ShieldCheck, Target
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { loginKairosAccount } from '@/lib/account-api'
+import { saveKairosAccountSession } from '@/lib/account-session'
 
 interface LoginFields {
   email: string
@@ -47,15 +49,19 @@ export default function LoginPage() {
     }
 
     setIsLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 700))
-    router.push('/dashboard')
+    try {
+      const loginResponse = await loginKairosAccount(fields.email, fields.password)
+      saveKairosAccountSession(loginResponse)
+      router.push('/dashboard')
+    } catch (error) {
+      setErrors({ form: formatLoginError(error) })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleGoogleSignIn = async () => {
-    setErrors({})
-    setIsLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 700))
-    router.push('/dashboard')
+    setErrors({ form: 'Google sign-in is not connected in the MVP backend yet.' })
   }
 
   return (
@@ -173,7 +179,7 @@ export default function LoginPage() {
                   <div>
                     <p className="text-sm font-semibold text-foreground">Prototype access</p>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Any filled email and password signs into the local dashboard demo.
+                      Use the account credentials created in Kairos to access the dashboard.
                     </p>
                   </div>
                 </div>
@@ -193,6 +199,14 @@ export default function LoginPage() {
       </div>
     </main>
   )
+}
+
+function formatLoginError(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message
+  }
+
+  return 'Unable to sign in: received unknown error; expected Kairos API response'
 }
 
 function AuthLogo() {
@@ -261,7 +275,7 @@ function AuthVisualPanel() {
             <div className="flex items-center justify-between border-b border-white/10 pb-5">
               <div>
                 <p className="text-sm font-semibold text-white">Today&apos;s Outreach Timing</p>
-                <p className="mt-1 text-xs text-slate-400">Florida, United States</p>
+                <p className="mt-1 text-xs text-slate-400">Connecticut, United States</p>
               </div>
               <span className="rounded-full border border-emerald-300/20 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-100">
                 12 ready now
@@ -277,21 +291,21 @@ function AuthVisualPanel() {
             <div className="mt-5 space-y-3">
               <OpportunityCard
                 name="Bright Smile Dental LLC"
-                meta="Miami, FL - Healthcare"
+                meta="Hartford, CT - Healthcare"
                 score="87"
                 stage="Best Outreach Window"
                 action="Reach out this week"
               />
               <OpportunityCard
                 name="Peak Fitness Studio LLC"
-                meta="Tampa, FL - Fitness"
+                meta="New Haven, CT - Fitness"
                 score="78"
                 stage="Best Outreach Window"
                 action="Send contextual intro"
               />
               <OpportunityCard
                 name="Nova Clean Services LLC"
-                meta="Orlando, FL - Cleaning"
+                meta="Stamford, CT - Cleaning"
                 score="62"
                 stage="Warming Up"
                 action="Add to watchlist"

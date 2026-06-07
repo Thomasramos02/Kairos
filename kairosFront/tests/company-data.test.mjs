@@ -41,6 +41,6 @@ test('watchlist companies include monitoring metadata and alert state', () => {
   for (const company of watchlistCompanies) {
     assert.ok(company.expectedStageChange)
     assert.equal(typeof company.alertEnabled, 'boolean')
-    assert.ok(['waiting', 'ready-to-contact', 'contacted', 'archived', 'not-a-fit'].includes(company.watchlistStatus))
+    assert.equal(Object.hasOwn(company, 'watchlistStatus'), false)
   }
 })

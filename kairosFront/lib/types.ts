@@ -5,15 +5,9 @@ export type TimingStage =
   | 'cooling-down' 
   | 'old-lead'
 
-export type WatchlistStatus = 
-  | 'waiting' 
-  | 'ready-to-contact' 
-  | 'contacted' 
-  | 'archived' 
-  | 'not-a-fit'
-
 export interface Company {
   id: string
+  sourceDocumentNumber?: string | null
   name: string
   location: {
     state: string
@@ -25,26 +19,58 @@ export interface Company {
   timingStage: TimingStage
   timingScore: number
   source: string
+  industryEnrichment?: CorporateIndustryEnrichment | null
+  reason?: string
+  digitalSignals?: readonly {
+    readonly signalName: string
+    readonly sourceName: string
+    readonly confidenceScore: number
+    readonly metadata: {
+      readonly contactMethods?: readonly {
+        readonly type: 'phone' | 'email' | 'contact-form' | 'address' | 'agent' | 'officer' | 'license'
+        readonly value: string
+        readonly source: 'registry' | 'website' | 'license' | 'county-btr'
+        readonly confidenceScore: number
+        readonly label?: string
+      }[]
+      readonly socialProfiles?: readonly {
+        readonly network: string
+        readonly url: string
+      }[]
+      readonly technologies?: readonly string[]
+      readonly websiteUrl?: string
+    }
+    readonly serviceImpact: string
+  }[]
+  recommendationStrength?: 'strong-match' | 'relevant' | 'monitor' | 'low-fit'
   recommendedAction: string
   scoreBreakdown: {
     ageWindow: number
     businessFit: number
     contactability: number
     dataConfidence: number
+    industryFit?: number
+    penalties?: number
   }
 }
 
 export interface WatchlistCompany extends Company {
-  watchlistStatus: WatchlistStatus
   expectedStageChange: string
   alertEnabled: boolean
   notes?: string
 }
 
+export type CorporateIndustryEnrichment = {
+  readonly state: 'CT' | 'GA' | 'CO' | 'FL'
+  readonly company_name: string
+  readonly naics_code: string
+  readonly industry: string
+  readonly confidence_score: number
+}
+
 export interface AlertSettings {
   email: boolean
   telegram: boolean
-  webhookUrl?: string
   weeklyDigest: boolean
   triggers: {
     newBusinessDetected: boolean

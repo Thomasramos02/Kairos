@@ -8,6 +8,8 @@ import { AlertCircle, ArrowRight, Check, Eye, EyeOff, MapPinned, ShieldCheck } f
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { loginKairosAccount, registerKairosAccount } from '@/lib/account-api'
+import { saveKairosAccountSession } from '@/lib/account-session'
 
 interface SignupFields {
   name: string
@@ -16,7 +18,7 @@ interface SignupFields {
   password: string
 }
 
-type SignupErrors = Partial<Record<keyof SignupFields, string>>
+type SignupErrors = Partial<Record<keyof SignupFields | 'form', string>>
 
 function getPasswordChecks(password: string) {
   return [
@@ -66,8 +68,22 @@ export default function SignupPage() {
     }
 
     setIsLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 700))
-    router.push('/onboarding')
+    try {
+      await registerKairosAccount({
+        companyName: fields.company.trim() || undefined,
+        email: fields.email,
+        name: fields.name,
+        password: fields.password,
+      })
+
+      const loginResponse = await loginKairosAccount(fields.email, fields.password)
+      saveKairosAccountSession(loginResponse)
+      router.push('/onboarding')
+    } catch (error) {
+      setErrors({ form: formatSignupError(error) })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -87,6 +103,8 @@ export default function SignupPage() {
                   Create your account first. You will define your target market in onboarding next.
                 </p>
               </div>
+
+              {errors.form && <FormError message={errors.form} />}
 
               <form noValidate onSubmit={handleSubmit} className="space-y-5">
                 <TextField
@@ -149,7 +167,7 @@ export default function SignupPage() {
                     <FieldError id="password-error" message={errors.password} />
                   ) : (
                     <p id="password-help" className="text-sm text-muted-foreground">
-                      Use a practical password for this prototype account.
+                      Use a practical password for this Kairos account.
                     </p>
                   )}
 
@@ -202,6 +220,23 @@ export default function SignupPage() {
         <AuthVisualPanel />
       </div>
     </main>
+  )
+}
+
+function formatSignupError(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message
+  }
+
+  return 'Unable to create account: received unknown error; expected Kairos API response'
+}
+
+function FormError({ message }: { message: string }) {
+  return (
+    <div className="mb-6 flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-destructive">
+      <AlertCircle className="h-4 w-4 flex-shrink-0" />
+      <p className="text-sm">{message}</p>
+    </div>
   )
 }
 

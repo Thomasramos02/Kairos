@@ -7,7 +7,7 @@ export default function AboutPage() {
       <div className="glass-card rounded-xl p-8">
         <h1 className="text-3xl font-bold text-foreground">About Kairos</h1>
         <p className="mt-4 text-muted-foreground">
-          Kairos is a timing intelligence prototype for B2B prospecting. It tracks newly
+          Kairos is timing intelligence for B2B prospecting. It tracks newly
           registered businesses and helps teams decide when outreach is more likely to be relevant.
         </p>
         <Button asChild className="mt-6">

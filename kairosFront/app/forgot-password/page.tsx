@@ -28,7 +28,7 @@ export default function ForgotPasswordPage() {
 
         <h1 className="text-2xl font-bold text-foreground">Reset your password</h1>
         <p className="mt-2 text-muted-foreground">
-          Enter your work email and Kairos will send a mock reset link for this prototype.
+          Enter your work email to request password recovery for your Kairos account.
         </p>
 
         {sent ? (

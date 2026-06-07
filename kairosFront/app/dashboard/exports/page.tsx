@@ -1,188 +1,162 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { sampleCompanies, sampleExports } from '@/lib/sample-data'
-import { companyToCsvRow, downloadCsv, exportCompanies, formatFileDate } from '@/lib/mock-actions'
-import { Download, FileSpreadsheet, Calendar, Filter, Check } from 'lucide-react'
+import { useState } from "react";
+import { Check, Download, FileSpreadsheet } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { exportKairosWatchlistCsv } from "@/lib/business-api";
+import { readKairosAccountSession } from "@/lib/account-session";
 
 const exportFields = [
-  { id: 'name', label: 'Company name', checked: true },
-  { id: 'registeredDate', label: 'Registered date', checked: true },
-  { id: 'ageDays', label: 'Age (days)', checked: true },
-  { id: 'state', label: 'State', checked: true },
-  { id: 'city', label: 'City', checked: true },
-  { id: 'industry', label: 'Industry', checked: true },
-  { id: 'timingStage', label: 'Timing stage', checked: true },
-  { id: 'timingScore', label: 'Timing score', checked: true },
-  { id: 'recommendedAction', label: 'Recommended action', checked: true },
-  { id: 'source', label: 'Source', checked: true },
-]
+  { id: "id", label: "Business ID", checked: true },
+  { id: "source_document_number", label: "Registry ID", checked: true },
+  { id: "company_name", label: "Company name", checked: true },
+  { id: "registered_at", label: "Registered date", checked: true },
+  { id: "age_days", label: "Age days", checked: true },
+  { id: "state", label: "State", checked: true },
+  { id: "city", label: "City", checked: true },
+  { id: "industry", label: "Industry", checked: true },
+  { id: "timing_stage", label: "Timing stage", checked: true },
+  { id: "timing_score", label: "Timing score", checked: true },
+  { id: "source", label: "Source", checked: true },
+  {
+    id: "recommendation_strength",
+    label: "Recommendation strength",
+    checked: true,
+  },
+  { id: "reason", label: "Timing reasoning", checked: true },
+  { id: "signals_count", label: "Signals count", checked: true },
+];
 
 export default function ExportsPage() {
-  const [fields, setFields] = useState(exportFields)
-  const [exported, setExported] = useState(false)
-  const [downloadedId, setDownloadedId] = useState('')
+  const [exportError, setExportError] = useState<string | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
+  const [exported, setExported] = useState(false);
 
-  const toggleField = (id: string) => {
-    setFields(fields.map((f) => (f.id === id ? { ...f, checked: !f.checked } : f)))
-  }
+  const handleExport = async () => {
+    const session = readKairosAccountSession();
 
-  const handleExport = () => {
-    const checkedFieldIds = fields.filter((field) => field.checked).map((field) => field.id)
-    const rows = sampleCompanies.map((company) => {
-      const row = companyToCsvRow(company)
-      const fieldMap: Record<string, string> = {
-        name: row.company_name,
-        registeredDate: row.registered_at,
-        ageDays: row.age_days,
-        state: row.state,
-        city: row.city,
-        industry: row.industry,
-        timingStage: row.timing_stage,
-        timingScore: row.timing_score,
-        recommendedAction: row.recommended_action,
-        source: row.source,
-      }
+    if (session === null) {
+      setExportError("Sign in again to export watchlist businesses.");
+      return;
+    }
 
-      return checkedFieldIds.reduce<Record<string, string>>((selected, fieldId) => {
-        const field = fields.find((item) => item.id === fieldId)
-        if (field) selected[field.label.toLowerCase().replaceAll(' ', '_').replaceAll('.', '')] = fieldMap[fieldId]
-        return selected
-      }, {})
-    })
+    setIsExporting(true);
+    setExportError(null);
 
-    downloadCsv(`kairos-current-leads-${formatFileDate()}.csv`, rows)
-    setExported(true)
-    setTimeout(() => setExported(false), 2000)
-  }
-
-  const handleDownloadPrevious = (exportId: string, fileName: string) => {
-    exportCompanies(fileName, sampleCompanies.slice(0, 5))
-    setDownloadedId(exportId)
-    setTimeout(() => setDownloadedId(''), 2000)
-  }
+    try {
+      const response = await exportKairosWatchlistCsv(
+        session.account.id,
+        session.accessToken,
+      );
+      downloadCsv(response.fileName, response.csv, response.contentType);
+      setExported(true);
+      window.setTimeout(() => setExported(false), 2000);
+    } catch (error) {
+      setExportError(formatExportError(error));
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground">Exports</h1>
-        <p className="text-muted-foreground mt-1">
-          Export company data as CSV files for use in your CRM or outreach tools.
+        <p className="mt-1 text-muted-foreground">
+          Export your saved watchlist businesses as CSV for review or CRM
+          import.
         </p>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Export Builder */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="glass-card rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                <Download className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold text-foreground">Export Current Leads</h2>
-                <p className="text-sm text-muted-foreground">Download companies matching your filters</p>
-              </div>
+      {exportError && (
+        <div className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {exportError}
+        </div>
+      )}
+
+      <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
+        <section className="surface-card rounded-lg p-6">
+          <div className="mb-6 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <Download className="h-5 w-5 text-primary" />
             </div>
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">
+                Export Watchlist Leads
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Export includes all required MVP fields, including source and
+                timing score.
+              </p>
+            </div>
+          </div>
 
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-sm font-medium text-foreground mb-3">Select fields to include</h3>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  {fields.map((field) => (
-                    <div key={field.id} className="flex items-center space-x-3">
-                      <Checkbox
-                        id={field.id}
-                        checked={field.checked}
-                        onCheckedChange={() => toggleField(field.id)}
-                      />
-                      <label
-                        htmlFor={field.id}
-                        className="text-sm font-medium text-foreground cursor-pointer"
-                      >
-                        {field.label}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-border">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="text-sm text-muted-foreground">
-                    <span className="font-medium text-foreground">15 companies</span> will be exported
-                  </div>
-                  <Button className="gap-2" onClick={handleExport} disabled={!fields.some((field) => field.checked)}>
-                    {exported ? <Check className="h-4 w-4" /> : <Download className="h-4 w-4" />}
-                    {exported ? 'Exported' : 'Export CSV'}
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Export includes all required MVP fields, including source and timing score.
+          <div className="grid gap-3 sm:grid-cols-2">
+            {exportFields.map((field) => (
+              <div
+                key={field.id}
+                className="rounded-lg border border-border bg-muted/30 px-3 py-2"
+              >
+                <p className="text-sm font-medium text-foreground">
+                  {field.label}
                 </p>
+                <p className="text-xs text-muted-foreground">{field.id}</p>
               </div>
-            </div>
+            ))}
           </div>
-        </div>
 
-        {/* Previous Exports */}
-        <div className="space-y-6">
-          <div className="glass-card rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Previous Exports</h2>
-
-            {sampleExports.length === 0 ? (
-              <div className="text-center py-8">
-                <div className="flex justify-center mb-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                    <FileSpreadsheet className="h-6 w-6 text-muted-foreground" />
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground">No exports yet</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {sampleExports.map((exp) => (
-                  <div
-                    key={exp.id}
-                    className="p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">
-                          {exp.fileName}
-                        </p>
-                        <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            {exp.date.toLocaleDateString()}
-                          </span>
-                          <span>{exp.recordCount} records</span>
-                        </div>
-                        <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-                          <Filter className="h-3 w-3" />
-                          <span className="truncate">{exp.filters}</span>
-                        </div>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 flex-shrink-0"
-                        onClick={() => handleDownloadPrevious(exp.id, exp.fileName)}
-                        aria-label={`Download ${exp.fileName}`}
-                      >
-                        {downloadedId === exp.id ? <Check className="h-4 w-4" /> : <Download className="h-4 w-4" />}
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+          <div className="mt-6 flex justify-end border-t border-border pt-4">
+            <Button
+              className="gap-2"
+              onClick={handleExport}
+              disabled={isExporting}
+            >
+              {exported ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              {isExporting
+                ? "Exporting..."
+                : exported
+                  ? "Exported"
+                  : "Export CSV"}
+            </Button>
           </div>
-        </div>
+        </section>
+
+        <aside className="surface-card rounded-lg p-6">
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+            <FileSpreadsheet className="h-6 w-6 text-primary" />
+          </div>
+          <h2 className="text-lg font-semibold text-foreground">CSV scope</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            This export contains only businesses saved in your watchlist.
+          </p>
+        </aside>
       </div>
     </div>
-  )
+  );
+}
+
+function downloadCsv(fileName: string, csv: string, contentType: string): void {
+  const blob = new Blob([csv], { type: `${contentType};charset=utf-8` });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+function formatExportError(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return "Unable to export businesses: received unknown error; expected Kairos API response";
 }

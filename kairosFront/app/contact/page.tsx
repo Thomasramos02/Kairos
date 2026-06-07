@@ -16,13 +16,13 @@ export default function ContactPage() {
       <div className="glass-card rounded-xl p-8">
         <h1 className="text-3xl font-bold text-foreground">Contact Kairos</h1>
         <p className="mt-2 text-muted-foreground">
-          Send a mock message to the Kairos team for this prototype.
+          Send a message about data coverage, onboarding, or alert delivery.
         </p>
 
         {sent ? (
           <div className="mt-6 rounded-lg border border-[#A7F3D0] bg-[#D1FAE5]/60 p-4 text-sm text-[#065F46]">
             <Check className="mr-2 inline h-4 w-4" />
-            Message sent. This is mock feedback for the MVP demo.
+            Message captured for the Kairos team.
           </div>
         ) : (
           <form

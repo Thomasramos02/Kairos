@@ -60,7 +60,7 @@ export function HeroSection() {
             </form>
 
             <p className="mt-4 text-sm text-muted-foreground">
-              Visual waitlist prototype. No credit card required.
+              Connecticut active coverage. No credit card required.
             </p>
 
             <div className="mt-8 grid gap-3 text-left sm:grid-cols-3">
@@ -118,7 +118,7 @@ export function HeroSection() {
                 <div className="mt-5 grid gap-2 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
                   {[
                     ['Source', 'State Registry'],
-                    ['Market', 'Florida, United States'],
+                    ['Market', 'Connecticut, United States'],
                     ['Action', 'Send contextual intro'],
                   ].map(([label, value]) => (
                     <div key={label} className="flex items-center justify-between gap-4 text-sm">

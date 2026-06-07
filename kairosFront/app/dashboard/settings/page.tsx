@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Bell, Check, CreditCard, MapPin, User } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -14,7 +15,29 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import { industries, states } from '@/lib/sample-data'
+import {
+  AlertChannel,
+  AlertFrequency,
+  createKairosMarketTarget,
+  CreateMarketTargetPayload,
+  OfferedService,
+  updateKairosAccount,
+} from '@/lib/account-api'
+import {
+  KairosAccountSession,
+  readKairosAccountSession,
+  updateKairosAccountSession,
+} from '@/lib/account-session'
+import {
+  readKairosMarketTargetSession,
+  saveKairosMarketTargetSession,
+} from '@/lib/market-target-session'
+import { industries } from '@/lib/sample-data'
+import {
+  findUsStateOption,
+  formatCoverageStatusLabel,
+  usStateOptions,
+} from '@/lib/us-state-options'
 
 type SettingsTab = 'account' | 'market' | 'alerts' | 'billing'
 
@@ -27,33 +50,141 @@ const tabs = [
 
 const customerTypes = ['Agencies', 'SDRs', 'Freelancers', 'Consultants', 'SaaS teams']
 
+const offeredServiceLabels: Record<OfferedService, string> = {
+  'website-design-development': 'Website design & development',
+  branding: 'Branding',
+  'seo-local-seo': 'SEO / local SEO',
+  'paid-marketing': 'Paid marketing',
+  'social-media-marketing': 'Social media marketing',
+  'e-commerce-services': 'E-commerce services',
+}
+
 export default function SettingsPage() {
+  const router = useRouter()
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
+  const [accountSession, setAccountSession] = useState<KairosAccountSession | null>(null)
   const [activeTab, setActiveTab] = useState<SettingsTab>('account')
   const [accountData, setAccountData] = useState({
-    name: 'John Smith',
-    email: 'john@company.com',
-    company: 'Acme Inc.',
+    name: '',
+    email: '',
+    companyName: '',
   })
   const [marketData, setMarketData] = useState({
     country: 'United States',
-    state: 'Florida',
-    city: 'Miami',
+    state: 'Connecticut',
+    city: '',
     industry: 'Healthcare - Dental',
     customerType: 'Agencies',
+    offeredService: 'website-design-development' as OfferedService,
   })
   const [alertData, setAlertData] = useState({
     email: true,
     telegram: false,
-    frequency: 'daily',
+    frequency: 'phase-change' as AlertFrequency,
     newBusinessDetected: true,
     bestWindow: true,
     savedCompanyChanged: true,
   })
 
-  const handleSave = () => {
+  useEffect(() => {
+    const session = readKairosAccountSession()
+
+    if (session === null) {
+      router.push('/login')
+      return
+    }
+
+    setAccountSession(session)
+    setAccountData({
+      companyName: session.account.companyName ?? '',
+      email: session.account.email,
+      name: session.account.name,
+    })
+    setAlertData((current) => ({
+      ...current,
+      email: session.account.alertPreference.channels.includes('email'),
+      frequency: session.account.alertPreference.frequency,
+      telegram: session.account.alertPreference.channels.includes('telegram'),
+    }))
+    hydrateMarketTargetData()
+  }, [router])
+
+  const handleSave = async () => {
+    setSaveError(null)
+
+    if (activeTab === 'billing') {
+      showSavedState()
+      return
+    }
+
+    if (accountSession === null) {
+      setSaveError('Unable to save settings: received empty session; expected authenticated account')
+      return
+    }
+
+    setIsSaving(true)
+
+    try {
+      await saveActiveSettings(accountSession)
+      showSavedState()
+    } catch (error) {
+      setSaveError(formatSettingsError(error))
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const hydrateMarketTargetData = () => {
+    const marketTarget = readKairosMarketTargetSession()
+
+    if (marketTarget === null) {
+      return
+    }
+
+    setMarketData({
+      city: marketTarget.cityOrRegion ?? '',
+      country: 'United States',
+      customerType: marketTarget.desiredCustomerType,
+      industry: marketTarget.industry,
+      offeredService: marketTarget.offeredService,
+      state: resolveStateName(marketTarget.state),
+    })
+  }
+
+  const saveActiveSettings = async (session: KairosAccountSession) => {
+    if (activeTab === 'market') {
+      await saveMarketSettings(session, marketData)
+      return
+    }
+
+    await saveAccountSettings(session)
+  }
+
+  const saveAccountSettings = async (session: KairosAccountSession) => {
+    const account = await updateKairosAccount(
+      session.account.id,
+      session.accessToken,
+      {
+        alertChannels: buildAlertChannels(alertData),
+        alertFrequency: alertData.frequency,
+        companyName: accountData.companyName.trim() || null,
+        name: accountData.name,
+      },
+    )
+
+    setAccountSession(updateKairosAccountSession(account))
+    setAccountData({
+      companyName: account.companyName ?? '',
+      email: account.email,
+      name: account.name,
+    })
+  }
+
+  const showSavedState = () => {
     setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+    window.setTimeout(() => setSaved(false), 2000)
   }
 
   return (
@@ -63,6 +194,11 @@ export default function SettingsPage() {
         <p className="text-muted-foreground mt-1">
           Manage account data, target market, and alert preferences.
         </p>
+        {saveError && (
+          <p className="mt-3 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            {saveError}
+          </p>
+        )}
       </div>
 
       <div className="flex flex-col gap-8 lg:flex-row">
@@ -92,6 +228,7 @@ export default function SettingsPage() {
               title="Account Information"
               description="Update the basic account fields required by the MVP."
               onSave={handleSave}
+              isSaving={isSaving}
               saved={saved}
             >
               <TextField
@@ -106,13 +243,14 @@ export default function SettingsPage() {
                 type="email"
                 value={accountData.email}
                 onChange={(value) => setAccountData({ ...accountData, email: value })}
+                helper="Email changes are not enabled in the MVP account API."
               />
               <TextField
                 id="company"
                 label="Company name"
                 helper="Optional, but useful for account context."
-                value={accountData.company}
-                onChange={(value) => setAccountData({ ...accountData, company: value })}
+                value={accountData.companyName}
+                onChange={(value) => setAccountData({ ...accountData, companyName: value })}
               />
             </SettingsCard>
           )}
@@ -122,6 +260,7 @@ export default function SettingsPage() {
               title="Target Market"
               description="Define the first market Kairos should monitor."
               onSave={handleSave}
+              isSaving={isSaving}
               saved={saved}
             >
               <div className="grid gap-4 sm:grid-cols-2">
@@ -136,7 +275,8 @@ export default function SettingsPage() {
                   id="state"
                   label="State"
                   value={marketData.state}
-                  values={states}
+                  values={usStateOptions.map((state) => state.name)}
+                  labels={buildStateLabels()}
                   onChange={(value) => setMarketData({ ...marketData, state: value })}
                 />
               </div>
@@ -163,6 +303,17 @@ export default function SettingsPage() {
                 helper="Keeps recommendations aligned with your outbound motion."
                 onChange={(value) => setMarketData({ ...marketData, customerType: value })}
               />
+              <SelectField
+                id="offered-service"
+                label="Service you sell"
+                value={marketData.offeredService}
+                values={Object.keys(offeredServiceLabels)}
+                labels={offeredServiceLabels}
+                helper="Kairos uses this to score timing and write contextual outreach."
+                onChange={(value) =>
+                  setMarketData({ ...marketData, offeredService: value as OfferedService })
+                }
+              />
             </SettingsCard>
           )}
 
@@ -171,6 +322,7 @@ export default function SettingsPage() {
               title="Alert Preferences"
               description="Configure the MVP alert channels and events."
               onSave={handleSave}
+              isSaving={isSaving}
               saved={saved}
             >
               <SwitchRow
@@ -189,9 +341,9 @@ export default function SettingsPage() {
                 id="alert-frequency"
                 label="Alert frequency"
                 value={alertData.frequency}
-                values={['realtime', 'daily', 'weekly']}
-                labels={{ realtime: 'Realtime', daily: 'Daily digest', weekly: 'Weekly digest' }}
-                onChange={(value) => setAlertData({ ...alertData, frequency: value })}
+                values={['phase-change', 'daily', 'weekly']}
+                labels={{ 'phase-change': 'Phase changes', daily: 'Daily digest', weekly: 'Weekly digest' }}
+                onChange={(value) => setAlertData({ ...alertData, frequency: value as AlertFrequency })}
               />
               <div className="space-y-4 border-t border-border pt-4">
                 <SwitchRow
@@ -214,7 +366,7 @@ export default function SettingsPage() {
           )}
 
           {activeTab === 'billing' && (
-            <StaticCard title="Billing" description="Manage subscription state for the beta prototype.">
+            <StaticCard title="Billing" description="Manage subscription state for the beta.">
               <div className="rounded-lg border border-primary/20 bg-primary/10 p-4">
                 <div className="flex items-center justify-between gap-4">
                   <div>
@@ -242,12 +394,14 @@ function SettingsCard({
   description,
   children,
   onSave,
+  isSaving,
   saved,
 }: {
   title: string
   description: string
   children: React.ReactNode
   onSave: () => void
+  isSaving: boolean
   saved: boolean
 }) {
   return (
@@ -255,13 +409,96 @@ function SettingsCard({
       <SectionHeader title={title} description={description} />
       <div className="space-y-4 border-t border-border pt-4">{children}</div>
       <div className="flex justify-end border-t border-border pt-4">
-        <Button onClick={onSave} className="gap-2">
+        <Button onClick={onSave} className="gap-2" disabled={isSaving}>
           {saved ? <Check className="h-4 w-4" /> : null}
-          {saved ? 'Saved!' : 'Save Changes'}
+          {isSaving ? 'Saving...' : saved ? 'Saved!' : 'Save Changes'}
         </Button>
       </div>
     </div>
   )
+}
+
+async function saveMarketSettings(
+  session: KairosAccountSession,
+  marketData: {
+    readonly city: string
+    readonly customerType: string
+    readonly industry: string
+    readonly offeredService: OfferedService
+    readonly state: string
+  },
+): Promise<void> {
+  const marketTarget = await createKairosMarketTarget(
+    session.accessToken,
+    buildMarketTargetPayload(session, marketData),
+  )
+  saveKairosMarketTargetSession(marketTarget)
+}
+
+function buildMarketTargetPayload(
+  session: KairosAccountSession,
+  marketData: {
+    readonly city: string
+    readonly customerType: string
+    readonly industry: string
+    readonly offeredService: OfferedService
+    readonly state: string
+  },
+): CreateMarketTargetPayload {
+  const selectedState = findUsStateOption(marketData.state)
+
+  if (selectedState === null) {
+    throw new Error(`Invalid state: received "${marketData.state}"; expected supported US state`)
+  }
+
+  return {
+    accountId: session.account.id,
+    cityOrRegion: marketData.city.trim() || undefined,
+    country: 'US',
+    desiredCustomerType: marketData.customerType,
+    industry: marketData.industry,
+    offeredService: marketData.offeredService,
+    state: selectedState.abbreviation,
+  }
+}
+
+function resolveStateName(state: string): string {
+  const stateOption = usStateOptions.find((option) => option.abbreviation === state)
+  return stateOption?.name ?? state
+}
+
+function buildStateLabels(): Record<string, string> {
+  return Object.fromEntries(
+    usStateOptions.map((state) => [
+      state.name,
+      state.name,
+    ]),
+  )
+}
+
+function buildAlertChannels(alertData: {
+  readonly email: boolean
+  readonly telegram: boolean
+}): readonly AlertChannel[] {
+  const channels: AlertChannel[] = []
+
+  if (alertData.email) {
+    channels.push('email')
+  }
+
+  if (alertData.telegram) {
+    channels.push('telegram')
+  }
+
+  return channels
+}
+
+function formatSettingsError(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message
+  }
+
+  return 'Unable to save settings: received unknown error; expected Kairos API response'
 }
 
 function StaticCard({

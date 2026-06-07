@@ -11,7 +11,8 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Search, SlidersHorizontal, X } from 'lucide-react'
-import { states, industries } from '@/lib/sample-data'
+import { industries } from '@/lib/sample-data'
+import { usStateOptions } from '@/lib/us-state-options'
 
 interface FiltersProps {
   onFilterChange?: (filters: FilterState) => void
@@ -94,9 +95,9 @@ export function CompanyFilters({ onFilterChange }: FiltersProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All States</SelectItem>
-              {states.map((state) => (
-                <SelectItem key={state} value={state}>
-                  {state}
+              {usStateOptions.map((state) => (
+                <SelectItem key={state.abbreviation} value={state.abbreviation}>
+                  {state.name}
                 </SelectItem>
               ))}
             </SelectContent>

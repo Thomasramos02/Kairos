@@ -62,52 +62,47 @@ function createCompany(
 }
 
 export const sampleCompanies: Company[] = [
-  createCompany('1', 'Bright Smile Dental LLC', 'Florida', 'Miami', 'Healthcare - Dental', 27, 87),
-  createCompany('2', 'Nova Clean Services LLC', 'Florida', 'Orlando', 'Cleaning Services', 14, 62),
-  createCompany('3', 'Peak Fitness Studio LLC', 'Florida', 'Tampa', 'Fitness & Wellness', 35, 78),
+  createCompany('1', 'Bright Smile Dental LLC', 'Connecticut', 'Hartford', 'Healthcare - Dental', 27, 87),
+  createCompany('2', 'Nova Clean Services LLC', 'Connecticut', 'Stamford', 'Cleaning Services', 14, 62),
+  createCompany('3', 'Peak Fitness Studio LLC', 'Connecticut', 'New Haven', 'Fitness & Wellness', 35, 78),
   createCompany('4', 'Urban Bloom Marketing LLC', 'California', 'Los Angeles', 'Marketing Agency', 5, 28),
   createCompany('5', 'FreshBite Cafe LLC', 'Texas', 'Austin', 'Food & Beverage', 42, 71),
   createCompany('6', 'ClearPath Accounting LLC', 'New York', 'New York City', 'Accounting Services', 19, 58),
-  createCompany('7', 'BloomCare Clinic LLC', 'Florida', 'Jacksonville', 'Healthcare - General', 31, 84),
+  createCompany('7', 'BloomCare Clinic LLC', 'Connecticut', 'Bridgeport', 'Healthcare - General', 31, 84),
   createCompany('8', 'TechFlow Solutions Inc', 'California', 'San Francisco', 'Software Development', 8, 45),
   createCompany('9', 'GreenLeaf Landscaping LLC', 'Texas', 'Houston', 'Landscaping', 52, 65),
   createCompany('10', 'Swift Logistics Co', 'Georgia', 'Atlanta', 'Logistics', 3, 22),
-  createCompany('11', 'Precision Auto Repair LLC', 'Florida', 'Miami', 'Automotive Services', 28, 82),
+  createCompany('11', 'Precision Auto Repair LLC', 'Connecticut', 'Waterbury', 'Automotive Services', 28, 82),
   createCompany('12', 'Harmony Yoga Studio', 'California', 'San Diego', 'Fitness & Wellness', 67, 48),
   createCompany('13', 'Blue Ocean Consulting', 'New York', 'New York City', 'Business Consulting', 24, 79),
-  createCompany('14', 'Sunrise Bakery LLC', 'Florida', 'Tampa', 'Food & Beverage', 11, 51),
+  createCompany('14', 'Sunrise Bakery LLC', 'Rhode Island', 'Providence', 'Food & Beverage', 11, 51),
   createCompany('15', 'CloudNine IT Services', 'Texas', 'Dallas', 'IT Services', 95, 35),
 ]
 
 export const watchlistCompanies: WatchlistCompany[] = [
   {
     ...sampleCompanies[0],
-    watchlistStatus: 'ready-to-contact',
     expectedStageChange: 'Cooling Down in 18 days',
     alertEnabled: true,
   },
   {
     ...sampleCompanies[2],
-    watchlistStatus: 'waiting',
     expectedStageChange: 'Cooling Down in 10 days',
     alertEnabled: true,
   },
   {
     ...sampleCompanies[6],
-    watchlistStatus: 'contacted',
     expectedStageChange: 'Cooling Down in 14 days',
     alertEnabled: false,
     notes: 'Sent intro email on Monday',
   },
   {
     ...sampleCompanies[10],
-    watchlistStatus: 'ready-to-contact',
     expectedStageChange: 'Cooling Down in 17 days',
     alertEnabled: true,
   },
   {
     ...sampleCompanies[12],
-    watchlistStatus: 'waiting',
     expectedStageChange: 'Cooling Down in 21 days',
     alertEnabled: true,
   },
@@ -117,9 +112,9 @@ export const sampleExports: Export[] = [
   {
     id: '1',
     date: new Date('2026-05-31T12:00:00.000Z'),
-    fileName: 'florida-dental-clinics-may-2024.csv',
+    fileName: 'connecticut-dental-clinics-may-2026.csv',
     recordCount: 47,
-    filters: 'Florida, Healthcare - Dental, Best Window',
+    filters: 'Connecticut, Healthcare - Dental, Best Window',
   },
   {
     id: '2',

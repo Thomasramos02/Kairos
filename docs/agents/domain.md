@@ -27,5 +27,9 @@ Use the product language from the primary docs:
 - "watchlist"
 - "alertas"
 - "abordagem contextual"
+- "Timing Intelligence"
+- "Outreach Relevance"
+- "Contextual Outreach"
+- "Watched Business"
 
 Avoid repositioning Kairos as a generic lead database, CRM, or mass outreach tool.
