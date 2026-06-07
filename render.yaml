@@ -17,7 +17,7 @@ services:
           property: connectionString
       - key: VALKEY_URL
         fromService:
-          type: redis
+          type: keyvalue
           name: kairos-redis
           property: connectionString
       - key: JWT_SECRET
@@ -27,15 +27,16 @@ services:
       - key: NEXT_PUBLIC_KAIROS_API_URL
         value: "/kairos-api"
 
+  # Redis (Render Key Value / Valkey 8)
+  - type: keyvalue
+    name: kairos-redis
+    plan: starter
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []
+
 databases:
   - name: kairos-db
     databaseName: kairos
     user: kairos
     plan: starter
     postgresMajorVersion: 17
-
-redis:
-  - name: kairos-redis
-    plan: starter
-    maxmemoryPolicy: allkeys-lru
-    ipAllowList: []
