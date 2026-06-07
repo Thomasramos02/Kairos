@@ -4,7 +4,7 @@
   "private": true,
   "description": "Kairos backend API and workers.",
   "scripts": {
-    "build": "nest build",
+    "build": "./node_modules/.bin/nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "db:migrate": "node scripts/run-migration.js",
     "infra:down": "docker compose down",
