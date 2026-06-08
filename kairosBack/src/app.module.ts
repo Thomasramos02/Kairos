@@ -21,9 +21,9 @@ import { WorkersModule } from './workers/workers.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', 'kairosFront', 'out'),
-      exclude: ['/kairos-api/(.*)'],
-    }),
+    rootPath: join(__dirname, '..', '..', 'kairosFront', 'out'),
+    exclude: ['/kairos-api{/*path}'],
+  }),
     DatabaseModule,
     QueueModule,
     OutboxModule,
