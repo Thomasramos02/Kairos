@@ -1,41 +1,55 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { Bookmark, Building2, Calendar, Check, Eye, Mail, MapPin } from 'lucide-react'
+import { useState } from "react";
+import Link from "next/link";
+import {
+  Bookmark,
+  Building2,
+  Calendar,
+  Check,
+  Eye,
+  Mail,
+  MapPin,
+} from "lucide-react";
 
-import { Button } from '@/components/ui/button'
-import { OfferedService } from '@/lib/account-api'
-import { readKairosAccountSession } from '@/lib/account-session'
-import { createKairosOutreachSuggestion, saveKairosWatchlistItem } from '@/lib/business-api'
+import { Button } from "@/components/ui/button";
+import { OfferedService } from "@/lib/account-api";
+import { readKairosAccountSession } from "@/lib/account-session";
+import {
+  createKairosOutreachSuggestion,
+  saveKairosWatchlistItem,
+} from "@/lib/business-api";
 import {
   buildRecommendationContext,
   buildServiceRecommendationLabel,
-} from '@/lib/business-display'
-import { copyToClipboard } from '@/lib/mock-actions'
-import { type Company } from '@/lib/types'
-import { TimingBadge } from './timing-badge'
+} from "@/lib/business-display";
+import { copyToClipboard } from "@/lib/mock-actions";
+import { type Company } from "@/lib/types";
+import { TimingBadge } from "./timing-badge";
 
 interface CompanyCardProps {
-  company: Company
-  offeredService: OfferedService
+  company: Company;
+  offeredService: OfferedService;
 }
 
 export function CompanyCard({ company, offeredService }: CompanyCardProps) {
-  const [saved, setSaved] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [copied, setCopied] = useState(false)
-  const [saveError, setSaveError] = useState<string | null>(null)
-  const recommendation = buildRecommendationContext(company)
-  const serviceRecommendation = buildServiceRecommendationLabel(company, offeredService)
-  const formattedDate = formatRegisteredDate(company.registeredDate)
+  const [saved, setSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const recommendation = buildRecommendationContext(company);
+  const serviceRecommendation = buildServiceRecommendationLabel(
+    company,
+    offeredService,
+  );
+  const formattedDate = formatRegisteredDate(company.registeredDate);
 
   const handleCopyOutreach = async () => {
-    const session = readKairosAccountSession()
+    const session = readKairosAccountSession();
 
     if (session === null) {
-      setSaveError('Sign in again to copy a suggested outreach message.')
-      return
+      setSaveError("Sign in again to copy a suggested outreach message.");
+      return;
     }
 
     try {
@@ -43,36 +57,40 @@ export function CompanyCard({ company, offeredService }: CompanyCardProps) {
         session.accessToken,
         company,
         offeredService,
-      )
-      await copyToClipboard(suggestion.message)
-      setCopied(true)
-      setSaveError(null)
-      window.setTimeout(() => setCopied(false), 1800)
+      );
+      await copyToClipboard(suggestion.message);
+      setCopied(true);
+      setSaveError(null);
+      window.setTimeout(() => setCopied(false), 1800);
     } catch (error) {
-      setSaveError(formatCompanyCardError(error))
+      setSaveError(formatCompanyCardError(error));
     }
-  }
+  };
 
   const handleSaveToWatchlist = async () => {
-    const session = readKairosAccountSession()
+    const session = readKairosAccountSession();
 
     if (session === null) {
-      setSaveError('Sign in again to save this company.')
-      return
+      setSaveError("Sign in again to save this company.");
+      return;
     }
 
-    setIsSaving(true)
+    setIsSaving(true);
 
     try {
-      await saveKairosWatchlistItem(session.account.id, session.accessToken, company.id)
-      setSaved(true)
-      setSaveError(null)
+      await saveKairosWatchlistItem(
+        session.account.id,
+        session.accessToken,
+        company.id,
+      );
+      setSaved(true);
+      setSaveError(null);
     } catch (error) {
-      setSaveError(formatCompanyCardError(error))
+      setSaveError(formatCompanyCardError(error));
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   return (
     <article className="surface-card rounded-xl border border-border p-4 transition-colors hover:border-primary/30">
@@ -91,7 +109,9 @@ export function CompanyCard({ company, offeredService }: CompanyCardProps) {
           <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">
             {recommendation.actionLabel}: {recommendation.whyNow}
           </p>
-          {saveError && <p className="mt-3 text-sm text-destructive">{saveError}</p>}
+          {saveError && (
+            <p className="mt-3 text-sm text-destructive">{saveError}</p>
+          )}
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 lg:justify-end">
@@ -107,7 +127,7 @@ export function CompanyCard({ company, offeredService }: CompanyCardProps) {
         </div>
       </div>
     </article>
-  )
+  );
 }
 
 function CompanyCardHeader({ company }: { company: Company }) {
@@ -118,7 +138,7 @@ function CompanyCardHeader({ company }: { company: Company }) {
       </div>
       <div className="min-w-0 flex-1">
         <Link
-          href={`/dashboard/company/view?id=${company.id}`}
+          href={`/dashboard/company?id=${encodeURIComponent(company.id)}`}
           className="line-clamp-1 text-base font-semibold text-foreground transition-colors hover:text-primary"
         >
           {company.name}
@@ -126,7 +146,7 @@ function CompanyCardHeader({ company }: { company: Company }) {
         <CompanyCardMetadata company={company} />
       </div>
     </div>
-  )
+  );
 }
 
 function CompanyCardMetadata({ company }: { company: Company }) {
@@ -145,7 +165,7 @@ function CompanyCardMetadata({ company }: { company: Company }) {
         {company.ageInDays} days old
       </span>
     </div>
-  )
+  );
 }
 
 function TimingScore({ value }: { value: number }) {
@@ -154,7 +174,7 @@ function TimingScore({ value }: { value: number }) {
       <p className="text-2xl font-bold leading-none text-foreground">{value}</p>
       <p className="mt-1 text-xs text-muted-foreground">Timing Score</p>
     </div>
-  )
+  );
 }
 
 function CompanyCardActions({
@@ -165,31 +185,41 @@ function CompanyCardActions({
   onSave,
   saved,
 }: {
-  copied: boolean
-  companyId: string
-  isSaving: boolean
-  onCopyOutreach: () => void
-  onSave: () => void
-  saved: boolean
+  copied: boolean;
+  companyId: string;
+  isSaving: boolean;
+  onCopyOutreach: () => void;
+  onSave: () => void;
+  saved: boolean;
 }) {
   return (
     <div className="flex items-center gap-2">
       <Button
-        variant={saved ? 'default' : 'outline'}
+        variant={saved ? "default" : "outline"}
         size="sm"
         className="h-10 gap-2"
-        title={saved ? 'Saved to Watchlist' : 'Save to Watchlist'}
-        aria-label={saved ? 'Saved to Watchlist' : 'Save to Watchlist'}
+        title={saved ? "Saved to Watchlist" : "Save to Watchlist"}
+        aria-label={saved ? "Saved to Watchlist" : "Save to Watchlist"}
         onClick={onSave}
         disabled={isSaving || saved}
       >
-        {saved ? <Check className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
+        {saved ? (
+          <Check className="h-4 w-4" />
+        ) : (
+          <Bookmark className="h-4 w-4" />
+        )}
         <span className="hidden sm:inline">
-          {isSaving ? 'Saving...' : saved ? 'Saved' : 'Save'}
+          {isSaving ? "Saving..." : saved ? "Saved" : "Save"}
         </span>
       </Button>
-      <Button variant="outline" size="sm" className="h-10 gap-2" asChild title="View Details">
-        <Link href={`/dashboard/company/view?id=${companyId}`}>
+      <Button
+        variant="outline"
+        size="sm"
+        className="h-10 gap-2"
+        asChild
+        title="View Details"
+      >
+        <Link href={`/dashboard/company?id=${encodeURIComponent(companyId)}`}>
           <Eye className="h-4 w-4" />
           <span className="hidden sm:inline">Details</span>
         </Link>
@@ -199,28 +229,30 @@ function CompanyCardActions({
         size="sm"
         className="h-10 gap-2"
         onClick={onCopyOutreach}
-        title={copied ? 'Copied' : 'Copy Outreach'}
-        aria-label={copied ? 'Copied outreach message' : 'Copy outreach message'}
+        title={copied ? "Copied" : "Copy Outreach"}
+        aria-label={
+          copied ? "Copied outreach message" : "Copy outreach message"
+        }
       >
         {copied ? <Check className="h-4 w-4" /> : <Mail className="h-4 w-4" />}
-        <span className="hidden sm:inline">{copied ? 'Copied' : 'Copy'}</span>
+        <span className="hidden sm:inline">{copied ? "Copied" : "Copy"}</span>
       </Button>
     </div>
-  )
+  );
 }
 
 function formatRegisteredDate(date: Date): string {
-  return date.toLocaleDateString('en-US', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
+  return date.toLocaleDateString("en-US", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 function formatCompanyCardError(error: unknown): string {
   if (error instanceof Error) {
-    return error.message
+    return error.message;
   }
 
-  return 'Unable to save company: received unknown error; expected Kairos API response'
+  return "Unable to save company: received unknown error; expected Kairos API response";
 }
