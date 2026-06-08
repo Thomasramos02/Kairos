@@ -1,7 +1,8 @@
 'use client'
 
-import { use, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import {
   ArrowLeft,
   Bookmark,
@@ -45,8 +46,9 @@ import { readKairosMarketTargetSession } from '@/lib/market-target-session'
 import { copyToClipboard } from '@/lib/mock-actions'
 import { Company, getTimingStageDescription, getTimingStageLabel } from '@/lib/types'
 
-export default function CompanyDetailPage({ params }: { params: { id: string } }) {
-  const { id } = params
+export default function CompanyDetailPage() {
+  const searchParams = useSearchParams()
+  const id = searchParams.get('id')
   const [company, setCompany] = useState<Company | null>(null)
   const [history, setHistory] = useState<readonly TimingStageHistoryEntry[]>([])
   const [loadError, setLoadError] = useState<string | null>(null)
@@ -57,8 +59,9 @@ export default function CompanyDetailPage({ params }: { params: { id: string } }
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
-    void loadCompanyDetail(resolvedParams.id)
-  }, [resolvedParams.id])
+    if (!id) return;
+    void loadCompanyDetail(id)
+  }, [id])
 
   useEffect(() => {
     if (company === null) return

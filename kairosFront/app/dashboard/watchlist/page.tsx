@@ -116,7 +116,7 @@ export default function WatchlistPage() {
                   <tr key={company.id} className="border-b border-border last:border-0 hover:bg-muted/20">
                     <td className="px-6 py-4">
                       <Link
-                        href={`/dashboard/company/${company.id}`}
+                        href={`/dashboard/company/view?id=${company.id}`}
                         className="font-medium text-foreground hover:text-primary"
                       >
                         {company.name}
@@ -138,7 +138,7 @@ export default function WatchlistPage() {
                     <td className="px-6 py-4">
                       <div className="flex justify-end">
                         <Button variant="ghost" size="sm" className="h-8 gap-2" asChild>
-                          <Link href={`/dashboard/company/${company.id}`}>
+                          <Link href={`/dashboard/company/view?id=${company.id}`}>
                             <Eye className="h-4 w-4" />
                             Details
                           </Link>

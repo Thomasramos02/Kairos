@@ -118,7 +118,7 @@ function CompanyCardHeader({ company }: { company: Company }) {
       </div>
       <div className="min-w-0 flex-1">
         <Link
-          href={`/dashboard/company/${company.id}`}
+          href={`/dashboard/company/view?id=${company.id}`}
           className="line-clamp-1 text-base font-semibold text-foreground transition-colors hover:text-primary"
         >
           {company.name}
@@ -189,7 +189,7 @@ function CompanyCardActions({
         </span>
       </Button>
       <Button variant="outline" size="sm" className="h-10 gap-2" asChild title="View Details">
-        <Link href={`/dashboard/company/${companyId}`}>
+        <Link href={`/dashboard/company/view?id=${companyId}`}>
           <Eye className="h-4 w-4" />
           <span className="hidden sm:inline">Details</span>
         </Link>
