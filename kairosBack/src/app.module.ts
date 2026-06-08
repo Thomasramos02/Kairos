@@ -7,7 +7,7 @@ import { DatabaseModule } from './database/database.module';
 import { AccountsModule } from './modules/accounts/accounts.module';
 import { AlertsModule } from './modules/alerts/alerts.module';
 import { BusinessModule } from './modules/businesses/business.module';
-import { CoverageModule } from './modules/coverage/coverage.module';
+import { CoverageModule } from '@modules/coverage/coverage.module';
 import { DigitalSignalModule } from './modules/digital-signals/digital-signal.module';
 import { ExportsModule } from './modules/exports/exports.module';
 import { MarketTargetsModule } from './modules/market-targets/market-targets.module';
