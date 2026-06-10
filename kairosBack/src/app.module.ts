@@ -5,6 +5,7 @@ import { join } from 'path';
 import { AppController } from './app.controller';
 import { DashboardStatsController } from './dashboard-stats.controller';
 import { DatabaseModule } from './database/database.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { AccountsModule } from './modules/accounts/accounts.module';
 import { AlertsModule } from './modules/alerts/alerts.module';
 import { BusinessModule } from './modules/businesses/business.module';
@@ -28,6 +29,7 @@ import { WorkersModule } from './workers/workers.module';
     DatabaseModule,
     QueueModule,
     OutboxModule,
+    AuthModule,
     AccountsModule,
     AlertsModule,
     BusinessModule,
