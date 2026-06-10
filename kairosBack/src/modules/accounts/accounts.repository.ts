@@ -24,6 +24,20 @@ export class AccountsRepository {
     return toPublicAccount(account);
   }
 
+  async findById(accountId: string): Promise<PublicAccount> {
+    const account = await this.database.query.accounts.findFirst({
+      where: (table, operators) => operators.eq(table.id, accountId),
+    });
+
+    if (account === undefined) {
+      throw new NotFoundException(
+        `Account not found: received id "${accountId}"; expected existing account id`,
+      );
+    }
+
+    return toPublicAccount(toAccount(account));
+  }
+
   async findByEmail(email: string): Promise<Account> {
     const account = await this.database.query.accounts.findFirst({
       where: (table, operators) => operators.eq(table.email, email),

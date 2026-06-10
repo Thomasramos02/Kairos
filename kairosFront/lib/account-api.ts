@@ -64,8 +64,8 @@ const kairosApiBaseUrl = readKairosApiBaseUrl(readBrowserSafeEnvironment())
 
 export async function registerKairosAccount(
   payload: RegisterAccountPayload,
-): Promise<PublicAccount> {
-  return await requestKairosApi<PublicAccount>('/auth/register', {
+): Promise<LoginAccountResponse> {
+  return await requestKairosApi<LoginAccountResponse>('/auth/register', {
     body: payload,
     method: 'POST',
   })
@@ -106,6 +106,38 @@ export async function createKairosMarketTarget(
   })
 }
 
+const kairosAccessTokenKey = 'kairos.accessToken'
+
+let cachedAccessToken: string | null = tryReadAccessTokenFromStorage()
+
+function tryReadAccessTokenFromStorage(): string | null {
+  try {
+    if (typeof window !== 'undefined') {
+      return window.localStorage.getItem(kairosAccessTokenKey)
+    }
+  } catch {
+    return null
+  }
+
+  return null
+}
+
+export function setAccessToken(token: string | null): void {
+  cachedAccessToken = token
+
+  try {
+    if (typeof window !== 'undefined') {
+      if (token === null) {
+        window.localStorage.removeItem(kairosAccessTokenKey)
+      } else {
+        window.localStorage.setItem(kairosAccessTokenKey, token)
+      }
+    }
+  } catch {
+    /* storage unavailable */
+  }
+}
+
 export async function requestKairosApi<ResponseBody>(
   path: string,
   options: {
@@ -113,9 +145,15 @@ export async function requestKairosApi<ResponseBody>(
     readonly method: 'DELETE' | 'GET' | 'PATCH' | 'POST'
   },
 ): Promise<ResponseBody> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+
+  if (cachedAccessToken !== null) {
+    headers['Authorization'] = `Bearer ${cachedAccessToken}`
+  }
+
   const response = await fetch(`${kairosApiBaseUrl}${path}`, {
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     credentials: 'include',
     method: options.method,
   })

@@ -8,7 +8,7 @@ import { AlertCircle, ArrowRight, Bell, Clock3, Eye, EyeOff, ShieldCheck, Target
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { loginKairosAccount } from '@/lib/account-api'
+import { loginKairosAccount, setAccessToken } from '@/lib/account-api'
 import { setCachedAccount } from '@/lib/account-session'
 
 interface LoginFields {
@@ -52,6 +52,7 @@ export default function LoginPage() {
     try {
       const loginResponse = await loginKairosAccount(fields.email, fields.password)
       setCachedAccount(loginResponse.account)
+      setAccessToken(loginResponse.accessToken)
       router.push('/dashboard')
     } catch (error) {
       setErrors({ form: formatLoginError(error) })

@@ -8,7 +8,7 @@ import { AlertCircle, ArrowRight, Check, Eye, EyeOff, MapPinned, ShieldCheck } f
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { loginKairosAccount, registerKairosAccount } from '@/lib/account-api'
+import { loginKairosAccount, registerKairosAccount, setAccessToken } from '@/lib/account-api'
 import { setCachedAccount } from '@/lib/account-session'
 
 interface SignupFields {
@@ -78,6 +78,7 @@ export default function SignupPage() {
 
       const loginResponse = await loginKairosAccount(fields.email, fields.password)
       setCachedAccount(loginResponse.account)
+      setAccessToken(loginResponse.accessToken)
       router.push('/onboarding')
     } catch (error) {
       setErrors({ form: formatSignupError(error) })

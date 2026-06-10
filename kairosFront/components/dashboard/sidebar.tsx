@@ -17,7 +17,7 @@ import {
 import { useEffect, useState } from 'react'
 import { getOrFetchAccount, clearCachedAccount } from '@/lib/account-session'
 import { countUnreadAlerts } from '@/lib/business-api'
-import { PublicAccount } from '@/lib/account-api'
+import { PublicAccount, setAccessToken } from '@/lib/account-api'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -47,6 +47,7 @@ export function DashboardSidebar() {
 
   const handleSignOut = () => {
     clearCachedAccount()
+    setAccessToken(null)
   }
 
   const initials = account !== null
