@@ -1,8 +1,6 @@
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { ArrowRight, Clock, ShieldCheck, Sparkles, Target } from 'lucide-react'
-
-const profiles = ['Agency', 'SDR', 'Freelancer', 'Consultant', 'SaaS']
 
 export function HeroSection() {
   return (
@@ -26,41 +24,22 @@ export function HeroSection() {
               and helps SDRs, agencies, and consultants act before competitors crowd the account.
             </p>
 
-            <form className="surface-card mt-8 rounded-xl p-3 text-left">
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <label className="sr-only" htmlFor="hero-email">Work email</label>
-                <Input
-                  id="hero-email"
-                  type="email"
-                  placeholder="you@company.com"
-                  className="h-11 bg-white"
-                />
-                <Button type="button" size="lg" className="h-11 shrink-0 gap-2">
-                  Get early access
+            <div className="mt-8 flex flex-col sm:flex-row gap-3">
+              <Button size="lg" className="h-11 gap-2" asChild>
+                <Link href="/signup">
+                  Try Kairos Beta
                   <ArrowRight className="h-4 w-4" />
-                </Button>
-              </div>
-
-              <div className="mt-4">
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                  What best describes you? <span className="normal-case tracking-normal">(optional)</span>
-                </p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {profiles.map((profile) => (
-                    <label
-                      key={profile}
-                      className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-border bg-white px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
-                    >
-                      <input className="h-3.5 w-3.5 accent-primary" type="radio" name="profile" />
-                      {profile}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </form>
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" className="h-11" asChild>
+                <Link href="/dashboard">
+                  View Dashboard
+                </Link>
+              </Button>
+            </div>
 
             <p className="mt-4 text-sm text-muted-foreground">
-              Connecticut active coverage. No credit card required.
+              Connecticut active coverage. Free during beta — no credit card required.
             </p>
 
             <div className="mt-8 grid gap-3 text-left sm:grid-cols-3">

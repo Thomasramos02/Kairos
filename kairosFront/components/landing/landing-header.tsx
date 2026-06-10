@@ -20,9 +20,12 @@ export function LandingHeader() {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex md:items-center md:gap-8">
-            <Link href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Timing
+          <div className="hidden md:flex md:items-center md:gap-6">
+            <Link href="#why-timing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Why Timing
+            </Link>
+            <Link href="#timing-stages" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Stages
             </Link>
             <Link href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               How it Works
@@ -30,11 +33,8 @@ export function LandingHeader() {
             <Link href="#dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Dashboard
             </Link>
-            <Link href="#use-cases" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Use Cases
-            </Link>
-            <Link href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Pricing
+            <Link href="#cta" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Get Started
             </Link>
           </div>
 
@@ -43,7 +43,7 @@ export function LandingHeader() {
               <Link href="/login">Log in</Link>
             </Button>
             <Button asChild>
-              <Link href="#pricing">Get early access</Link>
+              <Link href="/signup">Sign Up</Link>
             </Button>
           </div>
 
@@ -62,27 +62,27 @@ export function LandingHeader() {
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-border">
             <div className="flex flex-col gap-4">
-              <Link href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-                Timing
+              <Link href="#why-timing" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium text-muted-foreground hover:text-foreground">
+                Why Timing
               </Link>
-              <Link href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+              <Link href="#timing-stages" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium text-muted-foreground hover:text-foreground">
+                Stages
+              </Link>
+              <Link href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium text-muted-foreground hover:text-foreground">
                 How it Works
               </Link>
-              <Link href="#dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+              <Link href="#dashboard" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium text-muted-foreground hover:text-foreground">
                 Dashboard
               </Link>
-              <Link href="#use-cases" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-                Use Cases
-              </Link>
-              <Link href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-                Pricing
+              <Link href="#cta" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium text-muted-foreground hover:text-foreground">
+                Get Started
               </Link>
               <div className="flex flex-col gap-2 pt-4 border-t border-border">
                 <Button variant="ghost" asChild className="justify-start">
                   <Link href="/login">Log in</Link>
                 </Button>
                 <Button asChild>
-                  <Link href="#pricing">Get early access</Link>
+                  <Link href="/signup">Sign Up</Link>
                 </Button>
               </div>
             </div>
