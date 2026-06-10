@@ -31,6 +31,7 @@ function createAlertEvent() {
     businessId: 'biz_1',
     reason: 'new-business' as const,
     channels: ['telegram'] as const,
+    readAt: null,
     createdAt: '2026-01-01T00:00:00.000Z',
   };
 }

@@ -17,6 +17,7 @@ export class AlertsRepository {
     accountId: string,
     businessId: string,
     reason: AlertReason,
+    channels: readonly ('email' | 'telegram')[],
   ): Promise<AlertEvent> {
     const [alertEvent] = await this.database
       .insert(alertEvents)
@@ -25,10 +26,9 @@ export class AlertsRepository {
         accountId,
         businessId,
         reason,
-        channels: ['email', 'telegram'],
+        channels,
       })
       .returning();
-
     return toAlertEvent(alertEvent);
   }
 

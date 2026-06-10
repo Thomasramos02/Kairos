@@ -13,6 +13,7 @@ import {
   AlertEvent,
   listKairosAlerts,
   listKairosBusinesses,
+  markAlertAsRead,
   toCompany,
 } from '@/lib/business-api'
 import { readKairosMarketTargetSession } from '@/lib/market-target-session'
@@ -39,6 +40,7 @@ export default function AlertsPage() {
   const [saveError, setSaveError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [readingIds, setReadingIds] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     getOrFetchAccount().then((account) => {
@@ -69,6 +71,27 @@ export default function AlertsPage() {
       setCompanies(businesses.map(toCompany))
     } catch (error) {
       setSaveError(formatAlertError(error))
+    }
+  }
+
+  const handleMarkAsRead = async (alertId: string) => {
+    setReadingIds((current) => new Set(current).add(alertId))
+
+    try {
+      await markAlertAsRead(alertId)
+      setAlertEvents((current) =>
+        current.map((event) =>
+          event.id === alertId ? { ...event, readAt: new Date().toISOString() } : event,
+        ),
+      )
+    } catch {
+      /* silent — mark-as-read failures are non-critical */
+    } finally {
+      setReadingIds((current) => {
+        const next = new Set(current)
+        next.delete(alertId)
+        return next
+      })
     }
   }
 
@@ -190,6 +213,8 @@ export default function AlertsPage() {
                 alertEvent={alertEvent}
                 companyName={resolveAlertBusinessName(alertEvent, companies)}
                 key={alertEvent.id}
+                isReading={readingIds.has(alertEvent.id)}
+                onMarkAsRead={handleMarkAsRead}
               />
             ))
           ) : (
@@ -214,23 +239,45 @@ export default function AlertsPage() {
 function AlertEventRow({
   alertEvent,
   companyName,
+  isReading,
+  onMarkAsRead,
 }: {
   alertEvent: AlertEvent
   companyName: string
+  isReading: boolean
+  onMarkAsRead: (alertId: string) => void
 }) {
+  const isUnread = alertEvent.readAt === null
+
   return (
-    <div className="rounded-lg border border-border bg-muted/30 p-3">
+    <button
+      type="button"
+      onClick={() => { if (isUnread) { onMarkAsRead(alertEvent.id) } }}
+      disabled={isReading}
+      className={`w-full rounded-lg border p-3 text-left transition-colors ${
+        isUnread
+          ? 'border-primary/20 bg-primary/5 hover:bg-primary/10'
+          : 'border-border bg-muted/30'
+      } ${isReading ? 'opacity-50' : ''}`}
+    >
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="font-medium text-foreground">{formatAlertReason(alertEvent.reason)}</p>
-          <p className="mt-1 text-sm text-muted-foreground">{companyName}</p>
+        <div className="flex items-start gap-3">
+          {isUnread && (
+            <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
+          )}
+          <div>
+            <p className={`font-medium ${isUnread ? 'text-foreground' : 'text-muted-foreground'}`}>
+              {formatAlertReason(alertEvent.reason)}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">{companyName}</p>
+          </div>
         </div>
         <p className="text-sm text-muted-foreground">{formatAlertDate(alertEvent.createdAt)}</p>
       </div>
       <p className="mt-2 text-xs font-medium uppercase text-muted-foreground">
         {formatAlertChannels(alertEvent.channels)}
       </p>
-    </div>
+    </button>
   )
 }
 

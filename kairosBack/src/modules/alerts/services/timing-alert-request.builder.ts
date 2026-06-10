@@ -19,7 +19,7 @@ export function buildTimingAlertRequests(
   }
 
   if (stageHistoryEntry.nextStage === "best-window") {
-    return buildWatchlistBestWindowAlerts(business.id, watchlistItems);
+    return buildWatchlistBestWindowAlerts(business.id, business.legalName, watchlistItems);
   }
 
   return buildMarketTargetAlerts(business, stageHistoryEntry, marketTargets);
@@ -37,6 +37,7 @@ function buildMarketTargetAlerts(
     .map((marketTarget) => ({
       accountId: marketTarget.accountId,
       businessId: business.id,
+      businessName: business.legalName,
       reason:
         stageHistoryEntry.previousStage === null
           ? "new-business"
@@ -74,11 +75,13 @@ function matchesOptionalCity(
 
 function buildWatchlistBestWindowAlerts(
   businessId: string,
+  businessName: string,
   watchlistItems: readonly WatchlistItem[],
 ): readonly CreateAlertRequest[] {
   return watchlistItems.map((watchlistItem) => ({
     accountId: watchlistItem.accountId,
     businessId,
+    businessName,
     reason: "entered-best-window",
   }));
 }

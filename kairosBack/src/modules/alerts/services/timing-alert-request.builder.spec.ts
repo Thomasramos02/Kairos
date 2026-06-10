@@ -14,7 +14,7 @@ describe("buildTimingAlertRequests", () => {
     );
 
     expect(requests).toEqual([
-      { accountId: "acct_1", businessId: "biz_1", reason: "new-business" },
+      { accountId: "acct_1", businessId: "biz_1", businessName: "Valori Stack LLC", reason: "new-business" },
     ]);
   });
 
@@ -33,6 +33,7 @@ describe("buildTimingAlertRequests", () => {
       {
         accountId: "acct_2",
         businessId: "biz_1",
+        businessName: "Valori Stack LLC",
         reason: "entered-best-window",
       },
     ]);
@@ -56,6 +57,7 @@ describe("buildTimingAlertRequests", () => {
       {
         accountId: "acct_1",
         businessId: "biz_1",
+        businessName: "Valori Stack LLC",
         reason: "timing-stage-changed",
       },
     ]);

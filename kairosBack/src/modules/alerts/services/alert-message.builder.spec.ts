@@ -8,10 +8,12 @@ describe('buildAlertDeliveryMessage', () => {
       businessId: 'biz_1',
       reason: 'entered-best-window',
       channels: ['email'],
+      readAt: null,
       createdAt: '2026-01-01T00:00:00.000Z',
-    });
+    }, 'Acme LLC');
 
-    expect(message.subject).toBe('Kairos alert: entered-best-window');
-    expect(message.text).toContain('Business: biz_1');
+    expect(message.subject).toBe('Kairos: Acme LLC — Entered best outreach window — time to act');
+    expect(message.text).toContain('Acme LLC');
+    expect(message.text).toContain('biz_1');
   });
 });
