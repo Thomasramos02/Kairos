@@ -25,9 +25,8 @@ import {
   updateKairosAccount,
 } from '@/lib/account-api'
 import {
-  KairosAccountSession,
-  readKairosAccountSession,
-  updateKairosAccountSession,
+  getOrFetchAccount,
+  setCachedAccount,
 } from '@/lib/account-session'
 import { saveKairosMarketTargetSession } from '@/lib/market-target-session'
 import { industries } from '@/lib/sample-data'
@@ -72,20 +71,19 @@ const initialFields: OnboardingFields = {
 
 export default function OnboardingPage() {
   const router = useRouter()
-  const [session, setSession] = useState<KairosAccountSession | null>(null)
+  const [session, setSession] = useState<{ id: string } | null>(null)
   const [fields, setFields] = useState<OnboardingFields>(initialFields)
   const [errors, setErrors] = useState<OnboardingErrors>({})
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    const currentSession = readKairosAccountSession()
-
-    if (currentSession === null) {
-      router.push('/login')
-      return
-    }
-
-    setSession(currentSession)
+    getOrFetchAccount().then((account) => {
+      if (account === null) {
+        router.push('/login')
+        return
+      }
+      setSession(account)
+    })
   }, [router])
 
   const updateField = <Field extends keyof OnboardingFields>(
@@ -218,24 +216,23 @@ export default function OnboardingPage() {
 }
 
 async function persistOnboarding(
-  session: KairosAccountSession,
+  session: { id: string },
   fields: OnboardingFields,
 ): Promise<void> {
-  const account = await updateKairosAccount(session.account.id, session.accessToken, {
+  const account = await updateKairosAccount(session.id, {
     alertChannels: buildAlertChannels(fields.alertChannels),
     alertFrequency: fields.alertFrequency,
   })
 
-  updateKairosAccountSession(account)
+  setCachedAccount(account)
   const marketTarget = await createKairosMarketTarget(
-    session.accessToken,
     buildMarketTargetPayload(session, fields),
   )
   saveKairosMarketTargetSession(marketTarget)
 }
 
 function buildMarketTargetPayload(
-  session: KairosAccountSession,
+  session: { id: string },
   fields: OnboardingFields,
 ): CreateMarketTargetPayload {
   const selectedState = findUsStateOption(fields.state)

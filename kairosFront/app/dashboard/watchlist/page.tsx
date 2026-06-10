@@ -14,7 +14,7 @@ import {
   toCompany,
   WatchlistItem,
 } from "@/lib/business-api";
-import { readKairosAccountSession } from "@/lib/account-session";
+import { getOrFetchAccount } from "@/lib/account-session";
 import { readKairosMarketTargetSession } from "@/lib/market-target-session";
 import { Company } from "@/lib/types";
 
@@ -29,23 +29,17 @@ export default function WatchlistPage() {
   }, []);
 
   const loadWatchlist = async () => {
-    const session = readKairosAccountSession();
+    const account = await getOrFetchAccount();
 
-    if (session === null) {
+    if (account === null) {
       setLoadError("Sign in again to load your watchlist.");
       setIsLoading(false);
       return;
     }
 
     try {
-      const savedItems = await listKairosWatchlist(
-        session.account.id,
-        session.accessToken,
-      );
-      const businesses = await loadSavedBusinesses(
-        session.accessToken,
-        savedItems,
-      );
+      const savedItems = await listKairosWatchlist(account.id);
+      const businesses = await loadSavedBusinesses(savedItems);
       setCompanies(businesses.map(toCompany));
     } catch (error) {
       setLoadError(formatWatchlistError(error));
@@ -55,19 +49,15 @@ export default function WatchlistPage() {
   };
 
   const handleRemove = async (company: Company) => {
-    const session = readKairosAccountSession();
+    const account = await getOrFetchAccount();
 
-    if (session === null) {
+    if (account === null) {
       setLoadError("Sign in again to remove this company.");
       return;
     }
 
     try {
-      await removeKairosWatchlistItem(
-        session.account.id,
-        session.accessToken,
-        company.id,
-      );
+      await removeKairosWatchlistItem(account.id, company.id);
       setCompanies((current) =>
         current.filter((item) => item.id !== company.id),
       );
@@ -205,7 +195,6 @@ export default function WatchlistPage() {
 }
 
 async function loadSavedBusinesses(
-  accessToken: string,
   savedItems: readonly WatchlistItem[],
 ): Promise<readonly BusinessListItem[]> {
   const offeredService = readKairosMarketTargetSession()?.offeredService;
@@ -213,7 +202,7 @@ async function loadSavedBusinesses(
 
   return await Promise.all(
     savedItems.map((item) =>
-      getKairosBusiness(accessToken, item.businessId, query),
+      getKairosBusiness(item.businessId, query),
     ),
   );
 }

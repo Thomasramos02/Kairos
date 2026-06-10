@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { loginKairosAccount, registerKairosAccount } from '@/lib/account-api'
-import { saveKairosAccountSession } from '@/lib/account-session'
+import { setCachedAccount } from '@/lib/account-session'
 
 interface SignupFields {
   name: string
@@ -77,7 +77,7 @@ export default function SignupPage() {
       })
 
       const loginResponse = await loginKairosAccount(fields.email, fields.password)
-      saveKairosAccountSession(loginResponse)
+      setCachedAccount(loginResponse.account)
       router.push('/onboarding')
     } catch (error) {
       setErrors({ form: formatSignupError(error) })

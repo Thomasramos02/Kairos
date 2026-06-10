@@ -144,7 +144,15 @@ export type AlertEvent = {
   readonly businessId: string
   readonly reason: AlertReason
   readonly channels: readonly ('email' | 'telegram')[]
+  readonly readAt: string | null
   readonly createdAt: string
+}
+
+export type DashboardStats = {
+  readonly newToday: number
+  readonly enteringBestWindow: number
+  readonly savedCompanies: number
+  readonly avgReadiness: number
 }
 
 export type OutreachSuggestion = {
@@ -164,10 +172,9 @@ export type OutreachSuggestionPayload = {
 type CompanyDigitalSignal = NonNullable<Company['digitalSignals']>[number]
 
 export async function listKairosBusinesses(
-  accessToken: string,
   query?: Pick<ListBusinessesPageQuery, 'offeredService'>,
 ): Promise<readonly BusinessListItem[]> {
-  const response = await listKairosBusinessPage(accessToken, {
+  const response = await listKairosBusinessPage({
     limit: 1000,
     offset: 0,
     offeredService: query?.offeredService ?? 'website-design-development',
@@ -177,17 +184,14 @@ export async function listKairosBusinesses(
 }
 
 export async function listKairosBusinessPage(
-  accessToken: string,
   query: ListBusinessesPageQuery,
 ): Promise<BusinessListPage> {
   return await requestKairosApi<BusinessListPage>(buildBusinessesPath(query), {
-    accessToken,
     method: 'GET',
   })
 }
 
 export async function getKairosBusiness(
-  accessToken: string,
   businessId: string,
   query?: Pick<ListBusinessesPageQuery, 'offeredService'>,
 ): Promise<BusinessListItem> {
@@ -195,7 +199,6 @@ export async function getKairosBusiness(
 
   try {
     return await requestKairosApi<BusinessListItem>(detailPath, {
-      accessToken,
       method: 'GET',
     })
   } catch (error) {
@@ -203,19 +206,17 @@ export async function getKairosBusiness(
       throw error
     }
 
-    return await findKairosBusinessFromList(accessToken, businessId, query)
+    return await findKairosBusinessFromList(businessId, query)
   }
 }
 
 export async function enrichKairosIndustryByCompanyId(
-  accessToken: string,
   state: string,
   companyId: string,
 ): Promise<CorporateIndustryEnrichment> {
   return await requestKairosApi<CorporateIndustryEnrichment>(
     buildIndustryEnrichmentPath(state, companyId),
     {
-      accessToken,
       method: 'GET',
     },
   )
@@ -223,11 +224,9 @@ export async function enrichKairosIndustryByCompanyId(
 
 export async function saveKairosWatchlistItem(
   accountId: string,
-  accessToken: string,
   businessId: string,
 ): Promise<WatchlistItem> {
   return await requestKairosApi<WatchlistItem>(buildWatchlistCollectionPath(accountId), {
-    accessToken,
     body: { businessId },
     method: 'POST',
   })
@@ -235,12 +234,10 @@ export async function saveKairosWatchlistItem(
 
 export async function listKairosWatchlist(
   accountId: string,
-  accessToken: string,
 ): Promise<readonly WatchlistItem[]> {
   return await requestKairosApi<readonly WatchlistItem[]>(
     `/accounts/${accountId}/watchlist`,
     {
-      accessToken,
       method: 'GET',
     },
   )
@@ -248,13 +245,11 @@ export async function listKairosWatchlist(
 
 export async function removeKairosWatchlistItem(
   accountId: string,
-  accessToken: string,
   businessId: string,
 ): Promise<WatchlistItem> {
   return await requestKairosApi<WatchlistItem>(
     buildWatchlistItemPath(accountId, businessId),
     {
-      accessToken,
       method: 'DELETE',
     },
   )
@@ -272,26 +267,22 @@ export function buildWatchlistCollectionPath(accountId: string): string {
 }
 
 export async function listKairosTimingHistory(
-  accessToken: string,
   businessId: string,
 ): Promise<readonly TimingStageHistoryEntry[]> {
   return await requestKairosApi<readonly TimingStageHistoryEntry[]>(
     `/businesses/${businessId}/timing-history`,
     {
-      accessToken,
       method: 'GET',
     },
   )
 }
 
 export async function recalculateKairosTimingStages(
-  accessToken: string,
   state?: string,
 ): Promise<{ readonly status: 'queued' }> {
   return await requestKairosApi<{ readonly status: 'queued' }>(
     '/jobs/recalculate-timing-stages',
     {
-      accessToken,
       body: state === undefined || state === 'all' ? {} : { state },
       method: 'POST',
     },
@@ -299,34 +290,28 @@ export async function recalculateKairosTimingStages(
 }
 
 export async function discoverKairosBusinesses(
-  accessToken: string,
   payload: DiscoverBusinessesPayload,
 ): Promise<QueuedJobResponse> {
   return await requestKairosApi<QueuedJobResponse>('/jobs/discover-businesses', {
-    accessToken,
     body: payload,
     method: 'POST',
   })
 }
 
 export async function exportKairosBusinessesCsv(
-  accessToken: string,
   query?: Pick<ListBusinessesPageQuery, 'offeredService' | 'state'>,
 ): Promise<CsvExportResponse> {
   return await requestKairosApi<CsvExportResponse>(buildExportBusinessesPath(query), {
-    accessToken,
     method: 'GET',
   })
 }
 
 export async function exportKairosWatchlistCsv(
   accountId: string,
-  accessToken: string,
 ): Promise<CsvExportResponse> {
   return await requestKairosApi<CsvExportResponse>(
     `/accounts/${accountId}/watchlist/export.csv`,
     {
-      accessToken,
       method: 'GET',
     },
   )
@@ -334,21 +319,51 @@ export async function exportKairosWatchlistCsv(
 
 export async function listKairosAlerts(
   accountId: string,
-  accessToken: string,
 ): Promise<readonly AlertEvent[]> {
   return await requestKairosApi<readonly AlertEvent[]>(`/accounts/${accountId}/alerts`, {
-    accessToken,
+    method: 'GET',
+  })
+}
+
+export async function markAlertAsRead(
+  alertId: string,
+): Promise<AlertEvent> {
+  return await requestKairosApi<AlertEvent>(`/alerts/${alertId}/read`, {
+    method: 'PATCH',
+  })
+}
+
+export async function deleteAlert(
+  alertId: string,
+): Promise<AlertEvent> {
+  return await requestKairosApi<AlertEvent>(`/alerts/${alertId}`, {
+    method: 'DELETE',
+  })
+}
+
+export async function countUnreadAlerts(
+  accountId: string,
+): Promise<number> {
+  const response = await requestKairosApi<{ readonly count: number }>(
+    `/accounts/${accountId}/alerts/unread-count`,
+    {
+      method: 'GET',
+    },
+  )
+  return response.count
+}
+
+export async function fetchDashboardStats(): Promise<DashboardStats> {
+  return await requestKairosApi<DashboardStats>('/dashboard/stats', {
     method: 'GET',
   })
 }
 
 export async function createKairosOutreachSuggestion(
-  accessToken: string,
   company: Company,
   offeredService: OfferedService,
 ): Promise<OutreachSuggestion> {
   return await requestKairosApi<OutreachSuggestion>('/outreach/suggestion', {
-    accessToken,
     body: buildOutreachSuggestionPayload(company, offeredService),
     method: 'POST',
   })
@@ -455,11 +470,10 @@ export function buildExportBusinessesPath(
 }
 
 async function findKairosBusinessFromList(
-  accessToken: string,
   businessId: string,
   query: Pick<ListBusinessesPageQuery, 'offeredService'> | undefined,
 ): Promise<BusinessListItem> {
-  const businesses = await listKairosBusinesses(accessToken, query)
+  const businesses = await listKairosBusinesses(query)
   const business = businesses.find((item) => item.id === businessId)
 
   if (business === undefined) {

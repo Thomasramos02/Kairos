@@ -81,24 +81,26 @@ export async function loginKairosAccount(
   })
 }
 
+export async function fetchKairosMe(): Promise<PublicAccount> {
+  return await requestKairosApi<PublicAccount>('/auth/me', {
+    method: 'GET',
+  })
+}
+
 export async function updateKairosAccount(
   accountId: string,
-  accessToken: string,
   payload: UpdateAccountPayload,
 ): Promise<PublicAccount> {
   return await requestKairosApi<PublicAccount>(`/accounts/${accountId}`, {
-    accessToken,
     body: payload,
     method: 'PATCH',
   })
 }
 
 export async function createKairosMarketTarget(
-  accessToken: string,
   payload: CreateMarketTargetPayload,
 ): Promise<MarketTarget> {
   return await requestKairosApi<MarketTarget>('/market-targets', {
-    accessToken,
     body: payload,
     method: 'POST',
   })
@@ -107,14 +109,14 @@ export async function createKairosMarketTarget(
 export async function requestKairosApi<ResponseBody>(
   path: string,
   options: {
-    readonly accessToken?: string
     readonly body?: object
     readonly method: 'DELETE' | 'GET' | 'PATCH' | 'POST'
   },
 ): Promise<ResponseBody> {
   const response = await fetch(`${kairosApiBaseUrl}${path}`, {
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
-    headers: buildKairosHeaders(options.accessToken),
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     method: options.method,
   })
 
@@ -123,17 +125,6 @@ export async function requestKairosApi<ResponseBody>(
   }
 
   return (await response.json()) as ResponseBody
-}
-
-export function buildKairosHeaders(accessToken: string | undefined): HeadersInit {
-  if (accessToken === undefined) {
-    return { 'Content-Type': 'application/json' }
-  }
-
-  return {
-    Authorization: `Bearer ${accessToken}`,
-    'Content-Type': 'application/json',
-  }
 }
 
 async function buildKairosApiError(

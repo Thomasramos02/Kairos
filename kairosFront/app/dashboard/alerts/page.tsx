@@ -8,11 +8,7 @@ import { useToast } from '@/hooks/use-toast'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { AlertChannel, AlertFrequency, updateKairosAccount } from '@/lib/account-api'
-import {
-  KairosAccountSession,
-  readKairosAccountSession,
-  updateKairosAccountSession,
-} from '@/lib/account-session'
+import { getOrFetchAccount, setCachedAccount } from '@/lib/account-session'
 import {
   AlertEvent,
   listKairosAlerts,
@@ -36,7 +32,7 @@ const initialAlertForm: AlertFormState = {
 
 export default function AlertsPage() {
   const { toast } = useToast()
-  const [session, setSession] = useState<KairosAccountSession | null>(null)
+  const [accountId, setAccountId] = useState<string | null>(null)
   const [alertEvents, setAlertEvents] = useState<readonly AlertEvent[]>([])
   const [companies, setCompanies] = useState<readonly Company[]>([])
   const [formState, setFormState] = useState<AlertFormState>(initialAlertForm)
@@ -45,27 +41,27 @@ export default function AlertsPage() {
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
-    const currentSession = readKairosAccountSession()
+    getOrFetchAccount().then((account) => {
+      if (account === null) {
+        setSaveError('Sign in again to manage alert preferences.')
+        return
+      }
 
-    if (currentSession === null) {
-      setSaveError('Sign in again to manage alert preferences.')
-      return
-    }
-
-    setSession(currentSession)
-    setFormState({
-      email: currentSession.account.alertPreference.channels.includes('email'),
-      frequency: currentSession.account.alertPreference.frequency,
-      telegram: currentSession.account.alertPreference.channels.includes('telegram'),
+      setAccountId(account.id)
+      setFormState({
+        email: account.alertPreference.channels.includes('email'),
+        frequency: account.alertPreference.frequency,
+        telegram: account.alertPreference.channels.includes('telegram'),
+      })
+      void loadAlertEvents(account.id)
     })
-    void loadAlertEvents(currentSession)
   }, [])
 
-  const loadAlertEvents = async (currentSession: KairosAccountSession) => {
+  const loadAlertEvents = async (id: string) => {
     try {
       const [events, businesses] = await Promise.all([
-        listKairosAlerts(currentSession.account.id, currentSession.accessToken),
-        listKairosBusinesses(currentSession.accessToken, {
+        listKairosAlerts(id),
+        listKairosBusinesses({
           offeredService: readKairosMarketTargetSession()?.offeredService,
         }),
       ])
@@ -77,7 +73,7 @@ export default function AlertsPage() {
   }
 
   const handleSave = async () => {
-    if (session === null) {
+    if (accountId === null) {
       setSaveError('Unable to save alerts: expected authenticated account session.')
       return
     }
@@ -86,11 +82,11 @@ export default function AlertsPage() {
     setSaveError(null)
 
     try {
-      const account = await updateKairosAccount(session.account.id, session.accessToken, {
+      const account = await updateKairosAccount(accountId, {
         alertChannels: buildAlertChannels(formState),
         alertFrequency: formState.frequency,
       })
-      setSession(updateKairosAccountSession(account))
+      setCachedAccount(account)
       setSaved(true)
       window.setTimeout(() => setSaved(false), 2000)
     } catch (error) {
