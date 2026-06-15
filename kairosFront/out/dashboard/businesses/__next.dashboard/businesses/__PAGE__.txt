@@ -1,13 +1,6 @@
 1:"$Sreact.fragment"
-<<<<<<< HEAD
-2:I[9919,["/_next/static/chunks/13l1.elm9q1o0.js","/_next/static/chunks/0h0y9g2cuytnb.js","/_next/static/chunks/03cafe8-b6bpz.js","/_next/static/chunks/14cx0yrjzy2s2.js","/_next/static/chunks/0edh6bo8hx8rj.js","/_next/static/chunks/09312gk1r3qg9.js","/_next/static/chunks/12v3yc65vg05t.js"],"CompanyList"]
-3:I[10435,["/_next/static/chunks/13l1.elm9q1o0.js","/_next/static/chunks/0h0y9g2cuytnb.js","/_next/static/chunks/03cafe8-b6bpz.js"],"OutletBoundary"]
-4:"$Sreact.suspense"
-0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"space-y-8","children":[["$","div",null,{"children":[["$","h1",null,{"className":"text-2xl font-bold text-foreground","children":"New Businesses"}],["$","p",null,{"className":"text-muted-foreground mt-1","children":"Browse newly registered businesses with timing stage, score, source, and outreach actions."}]]}],["$","$L2",null,{"groupByStage":false}]]}],[["$","script","script-0",{"src":"/_next/static/chunks/0edh6bo8hx8rj.js","async":true}],["$","script","script-1",{"src":"/_next/static/chunks/09312gk1r3qg9.js","async":true}],["$","script","script-2",{"src":"/_next/static/chunks/12v3yc65vg05t.js","async":true}]],["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"m5EiocMWrXFd6bauvTyJf"}
-=======
 2:I[15289,["/_next/static/chunks/0q0e5__3k_ive.js","/_next/static/chunks/0d3shmwh5_nmn.js","/_next/static/chunks/067grgq6yj6~0.js","/_next/static/chunks/0e8fjs4-7j2qx.js","/_next/static/chunks/0qfjq6107wpjj.js","/_next/static/chunks/15wpc.02uf0lx.js"],"CompanyList"]
 3:I[97367,["/_next/static/chunks/0q0e5__3k_ive.js","/_next/static/chunks/0d3shmwh5_nmn.js","/_next/static/chunks/067grgq6yj6~0.js"],"OutletBoundary"]
 4:"$Sreact.suspense"
 0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"space-y-8","children":[["$","div",null,{"children":[["$","h1",null,{"className":"text-2xl font-bold text-foreground","children":"New Businesses"}],["$","p",null,{"className":"text-muted-foreground mt-1","children":"Browse newly registered businesses with timing stage, score, source, and outreach actions."}]]}],["$","$L2",null,{"groupByStage":false}]]}],[["$","script","script-0",{"src":"/_next/static/chunks/0qfjq6107wpjj.js","async":true}],["$","script","script-1",{"src":"/_next/static/chunks/15wpc.02uf0lx.js","async":true}]],["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"oL57Ft-rRRq9wiJHu3169"}
->>>>>>> 0cc7802447f0cee6ce7d46558eb5bd52beafc943
 5:null

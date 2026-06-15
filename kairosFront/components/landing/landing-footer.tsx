@@ -13,8 +13,8 @@ export function LandingFooter() {
               <span className="text-xl font-semibold text-foreground">Kairos</span>
             </div>
             <p className="text-muted-foreground max-w-sm">
-              Timing intelligence for web designers, landing page builders,
-              branding freelancers, and local SEO freelancers.
+              Timing intelligence for B2B sales. Discover newly registered businesses 
+              early and reach out when timing is right.
             </p>
           </div>
 
@@ -37,18 +37,8 @@ export function LandingFooter() {
                 </Link>
               </li>
               <li>
-<<<<<<< HEAD
-                <Link href="#use-cases" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Niches
-                </Link>
-              </li>
-              <li>
-                <Link href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Beta
-=======
                 <Link href="#cta" className="text-muted-foreground hover:text-foreground transition-colors">
                   Get Started
->>>>>>> 0cc7802447f0cee6ce7d46558eb5bd52beafc943
                 </Link>
               </li>
             </ul>
@@ -86,7 +76,7 @@ export function LandingFooter() {
             &copy; {new Date().getFullYear()} Kairos. All rights reserved.
           </p>
           <p className="text-sm text-muted-foreground">
-            Made for digital presence freelancers who value better timing.
+            Made for B2B professionals who value better timing.
           </p>
         </div>
       </div>

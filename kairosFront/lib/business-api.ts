@@ -55,21 +55,6 @@ export type RecommendationStrength =
   | 'monitor'
   | 'low-fit'
 
-export type OpportunityFilter =
-  | 'no-website-detected'
-  | 'new-entity-under-30-days'
-  | 'local-business'
-  | 'high-confidence'
-  | 'contact-detected'
-
-export type BusinessOpportunitySummary = {
-  readonly contactDetected: boolean
-  readonly digitalPresenceStatus: string
-  readonly opportunityFilters: readonly OpportunityFilter[]
-  readonly opportunityReason: string
-  readonly websiteStatus: string
-}
-
 export type TimingScoreComponents = {
   readonly ageFitScore: number
   readonly dataConfidenceScore: number
@@ -96,8 +81,6 @@ export type BusinessListItem = {
   readonly timingStage: TimingStage
   readonly timingScore: number
   readonly reason: string
-  readonly opportunity: BusinessOpportunitySummary
-  readonly opportunityFilters: readonly OpportunityFilter[]
 }
 
 export type BusinessListPage = {
@@ -114,7 +97,6 @@ export type ListBusinessesPageQuery = {
   readonly limit?: number
   readonly minScore?: string
   readonly offset?: number
-  readonly opportunityFilters?: readonly OpportunityFilter[]
   readonly search?: string
   readonly state?: string
   readonly timingStage?: TimingStage | 'all'
@@ -317,12 +299,7 @@ export async function discoverKairosBusinesses(
 }
 
 export async function exportKairosBusinessesCsv(
-<<<<<<< HEAD
-  accessToken: string,
-  query?: Pick<ListBusinessesPageQuery, 'offeredService' | 'opportunityFilters' | 'state'>,
-=======
   query?: Pick<ListBusinessesPageQuery, 'offeredService' | 'state'>,
->>>>>>> 0cc7802447f0cee6ce7d46558eb5bd52beafc943
 ): Promise<CsvExportResponse> {
   return await requestKairosApi<CsvExportResponse>(buildExportBusinessesPath(query), {
     method: 'GET',
@@ -444,8 +421,6 @@ export function toCompany(business: BusinessListItem): Company {
     reason: business.reason,
     recommendationStrength: business.recommendationStrength,
     recommendedAction: buildRecommendedAction(business.timingStage),
-    opportunity: business.opportunity,
-    opportunityFilters: business.opportunityFilters,
     registeredDate: new Date(business.registeredAt),
     scoreBreakdown: buildScoreBreakdown(business),
     source: business.source,
@@ -476,10 +451,7 @@ export function buildBusinessDetailPath(
 }
 
 export function buildExportBusinessesPath(
-  query: Pick<
-    ListBusinessesPageQuery,
-    'offeredService' | 'opportunityFilters' | 'state'
-  > | undefined,
+  query: Pick<ListBusinessesPageQuery, 'offeredService' | 'state'> | undefined,
 ): string {
   const params = new URLSearchParams()
 
@@ -489,10 +461,6 @@ export function buildExportBusinessesPath(
 
   if (query?.offeredService !== undefined) {
     params.set('offeredService', query.offeredService)
-  }
-
-  if (query?.opportunityFilters !== undefined) {
-    params.set('opportunityFilters', query.opportunityFilters.join(','))
   }
 
   const queryString = params.toString()
@@ -611,7 +579,6 @@ export function buildBusinessesPath(query: ListBusinessesPageQuery): string {
   }
 
   addParam('minScore', query.minScore)
-  addParam('opportunityFilters', query.opportunityFilters?.join(','))
   addParam('offeredService', query.offeredService)
   addParam('limit', query.limit)
   addParam('offset', query.offset)
