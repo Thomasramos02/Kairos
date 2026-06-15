@@ -6,6 +6,7 @@ import { CompanyFilters, type FilterState } from "./company-filters";
 import { getTimingStageLabel, type TimingStage } from "@/lib/types";
 import {
   discoverKairosBusinesses,
+  listKairosWatchlist,
   listKairosBusinessPage,
   recalculateKairosTimingStages,
   toCompany,
@@ -39,6 +40,9 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
   const [isRecalculating, setIsRecalculating] = useState(false);
   const [pageOffset, setPageOffset] = useState(0);
   const [totalCompanies, setTotalCompanies] = useState(0);
+  const [savedBusinessIds, setSavedBusinessIds] = useState<ReadonlySet<string>>(
+    new Set(),
+  );
   const [offeredService, setOfferedService] = useState<OfferedService>(
     "website-design-development",
   );
@@ -107,27 +111,38 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
       const marketTarget = readKairosMarketTargetSession();
       const selectedService =
         marketTarget?.offeredService ?? "website-design-development";
-      const page = await listKairosBusinessPage({
-        city: activeFilters.city,
-        industry: activeFilters.industry,
-        limit: pageSize,
-        minScore: activeFilters.minScore,
-        offset,
-        search: activeFilters.search,
-        offeredService: selectedService,
-        state: activeFilters.state === "all" ? undefined : activeFilters.state,
-        timingStage: activeFilters.timingStage as TimingStage | "all",
-      });
+      const account = await getOrFetchAccount();
+      const [page, watchlist] = await Promise.all([
+        listKairosBusinessPage({
+          city: activeFilters.city,
+          industry: activeFilters.industry,
+          limit: pageSize,
+          minScore: activeFilters.minScore,
+          offset,
+          opportunityFilters: activeFilters.opportunityFilters,
+          search: activeFilters.search,
+          offeredService: selectedService,
+          state: activeFilters.state === "all" ? undefined : activeFilters.state,
+          timingStage: activeFilters.timingStage as TimingStage | "all",
+        }),
+        account === null ? Promise.resolve([]) : listKairosWatchlist(account.id),
+      ]);
       setOfferedService(selectedService);
+      setSavedBusinessIds(new Set(watchlist.map((item) => item.businessId)));
       setCompanies(page.items.map(toCompany));
       setTotalCompanies(page.total);
     } catch (error) {
       setLoadError(formatCompanyListError(error));
       setCompanies([]);
+      setSavedBusinessIds(new Set());
       setTotalCompanies(0);
     } finally {
       setIsLoading(false);
     }
+  }
+
+  function handleSavedBusiness(businessId: string): void {
+    setSavedBusinessIds((current) => new Set([...current, businessId]));
   }
 
   async function handleRecalculate(): Promise<void> {
@@ -251,7 +266,9 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
                     <CompanyCard
                       key={company.id}
                       company={company}
+                      initiallySaved={savedBusinessIds.has(company.id)}
                       offeredService={offeredService}
+                      onSaved={handleSavedBusiness}
                     />
                   ))}
                 </div>
@@ -277,7 +294,9 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
             <CompanyCard
               key={company.id}
               company={company}
+              initiallySaved={savedBusinessIds.has(company.id)}
               offeredService={offeredService}
+              onSaved={handleSavedBusiness}
             />
           ))}
           <PaginationBar

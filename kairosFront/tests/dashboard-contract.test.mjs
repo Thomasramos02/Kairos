@@ -105,6 +105,15 @@ test('business list exposes pagination controls after the result cards', () => {
   assert.ok(source.match(/<PaginationBar/g).length >= 3)
 })
 
+test('business list marks companies already saved in the watchlist', () => {
+  const source = readProjectFile('components/dashboard/company-list.tsx')
+
+  assert.match(source, /listKairosWatchlist/)
+  assert.match(source, /savedBusinessIds\.has\(company\.id\)/)
+  assert.match(source, /initiallySaved=/)
+  assert.match(source, /onSaved=/)
+})
+
 test('business list can sync covered states into backend discovery jobs', () => {
   const source = readProjectFile('components/dashboard/company-list.tsx')
 

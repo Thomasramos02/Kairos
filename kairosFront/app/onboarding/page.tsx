@@ -247,7 +247,7 @@ function buildMarketTargetPayload(
   }
 
   return {
-    accountId: session.account.id,
+    accountId: session.id,
     cityOrRegion: fields.cityOrRegion.trim() || undefined,
     country: 'US' as const,
     desiredCustomerType: fields.desiredCustomerType,

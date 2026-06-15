@@ -1,8 +1,9 @@
 "use client";
 
-import type { ComponentType } from "react";
+import type { ComponentType, KeyboardEvent } from "react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Bookmark,
   Building2,
@@ -44,6 +45,7 @@ export function CompanyCard({
   offeredService,
   onSaved,
 }: CompanyCardProps) {
+  const router = useRouter();
   const [saved, setSaved] = useState(initiallySaved);
   const [isSaving, setIsSaving] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -54,6 +56,7 @@ export function CompanyCard({
     offeredService,
   );
   const formattedDate = formatRegisteredDate(company.registeredDate);
+  const detailHref = buildCompanyDetailHref(company.id);
 
   useEffect(() => {
     setSaved(initiallySaved);
@@ -99,11 +102,30 @@ export function CompanyCard({
     }
   };
 
+  const handleOpenDetails = () => {
+    router.push(detailHref);
+  };
+
+  const handleCardKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.target !== event.currentTarget) return;
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    event.preventDefault();
+    router.push(detailHref);
+  };
+
   return (
-    <article className="surface-card rounded-lg border border-border p-4 transition-colors hover:border-primary/30">
+    <article
+      role="link"
+      tabIndex={0}
+      aria-label={`View details for ${company.name}`}
+      onClick={handleOpenDetails}
+      onKeyDown={handleCardKeyDown}
+      className="surface-card cursor-pointer rounded-lg border border-border p-4 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    >
       <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center">
         <div className="min-w-0">
-          <CompanyCardHeader company={company} />
+          <CompanyCardHeader company={company} detailHref={detailHref} />
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <TimingBadge stage={company.timingStage} size="sm" />
             <OpportunityBadges filters={company.opportunityFilters} />
@@ -123,7 +145,10 @@ export function CompanyCard({
           )}
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 lg:justify-end">
+        <div
+          className="flex flex-wrap items-center justify-between gap-3 lg:justify-end"
+          onClick={(event) => event.stopPropagation()}
+        >
           <TimingScore value={company.timingScore} />
           <CompanyCardActions
             copied={copied}
@@ -131,7 +156,7 @@ export function CompanyCard({
             onCopyOutreach={handleCopyOutreach}
             onSave={handleSaveToWatchlist}
             saved={saved}
-            companyId={company.id}
+            detailHref={detailHref}
           />
         </div>
       </div>
@@ -203,7 +228,13 @@ function OpportunityFact({
   );
 }
 
-function CompanyCardHeader({ company }: { company: Company }) {
+function CompanyCardHeader({
+  company,
+  detailHref,
+}: {
+  company: Company;
+  detailHref: string;
+}) {
   return (
     <div className="flex items-start gap-3">
       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-sm font-semibold text-primary">
@@ -211,8 +242,9 @@ function CompanyCardHeader({ company }: { company: Company }) {
       </div>
       <div className="min-w-0 flex-1">
         <Link
-          href={`/dashboard/company?id=${encodeURIComponent(company.id)}`}
+          href={detailHref}
           className="line-clamp-1 text-base font-semibold text-foreground transition-colors hover:text-primary"
+          onClick={(event) => event.stopPropagation()}
         >
           {company.name}
         </Link>
@@ -252,14 +284,14 @@ function TimingScore({ value }: { value: number }) {
 
 function CompanyCardActions({
   copied,
-  companyId,
+  detailHref,
   isSaving,
   onCopyOutreach,
   onSave,
   saved,
 }: {
   copied: boolean;
-  companyId: string;
+  detailHref: string;
   isSaving: boolean;
   onCopyOutreach: () => void;
   onSave: () => void;
@@ -292,7 +324,7 @@ function CompanyCardActions({
         asChild
         title="View Details"
       >
-        <Link href={`/dashboard/company?id=${encodeURIComponent(companyId)}`}>
+        <Link href={detailHref}>
           <Eye className="h-4 w-4" />
           <span className="hidden sm:inline">Details</span>
         </Link>
@@ -312,6 +344,10 @@ function CompanyCardActions({
       </Button>
     </div>
   );
+}
+
+function buildCompanyDetailHref(companyId: string): string {
+  return `/dashboard/company?id=${encodeURIComponent(companyId)}`;
 }
 
 function formatRegisteredDate(date: Date): string {

@@ -250,7 +250,7 @@ function CompanyDetailContent() {
           </Section>
 
           <Section title="Digital opportunity">
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid items-start gap-3 sm:grid-cols-2 xl:grid-cols-[repeat(3,minmax(0,1fr))_1.45fr]">
               <ContextMetric
                 label="Needs website?"
                 value={company.opportunity.websiteStatus}
@@ -270,6 +270,7 @@ function CompanyDetailContent() {
               <ContextMetric
                 label="Why now"
                 value={company.opportunity.opportunityReason}
+                className="sm:col-span-2 xl:col-span-1"
               />
             </div>
           </Section>
@@ -538,9 +539,19 @@ function SocialIcon({ network }: { network: string }) {
   return <Twitter className="h-3.5 w-3.5" />;
 }
 
-function ContextMetric({ label, value }: { label: string; value: string }) {
+function ContextMetric({
+  className = "",
+  label,
+  value,
+}: {
+  className?: string;
+  label: string;
+  value: string;
+}) {
   return (
-    <div className="min-w-0 rounded-lg border border-border bg-background/50 px-4 py-3 shadow-sm transition-all hover:shadow-md hover:border-primary/30">
+    <div
+      className={`h-fit min-w-0 rounded-lg border border-border bg-background/50 px-4 py-3 shadow-sm transition-all hover:border-primary/30 hover:shadow-md ${className}`}
+    >
       <p className="text-xs font-medium uppercase text-muted-foreground">
         {label}
       </p>
