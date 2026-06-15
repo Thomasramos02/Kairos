@@ -12,6 +12,10 @@ export type KairosMarketTargetSession = {
 const kairosMarketTargetSessionKey = 'kairos.marketTargetSession'
 
 export function readKairosMarketTargetSession(): KairosMarketTargetSession | null {
+  if (typeof window === 'undefined') {
+    return null
+  }
+
   const serializedTarget = window.localStorage.getItem(kairosMarketTargetSessionKey)
   return parseKairosMarketTargetSession(serializedTarget)
 }

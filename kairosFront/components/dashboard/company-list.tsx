@@ -75,7 +75,10 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
     };
 
     companies.forEach((company) => {
-      groups[company.timingStage].push(company);
+      const group = groups[company.timingStage];
+      if (group) {
+        group.push(company);
+      }
     });
 
     return groups;

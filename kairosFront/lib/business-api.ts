@@ -101,6 +101,7 @@ export type ListBusinessesPageQuery = {
   readonly state?: string
   readonly timingStage?: TimingStage | 'all'
   readonly offeredService?: OfferedService
+  readonly opportunityFilters?: readonly string[]
 }
 
 export type DiscoverBusinessesPayload = {
@@ -418,6 +419,8 @@ export function toCompany(business: BusinessListItem): Company {
       state: business.state,
     },
     name: business.name,
+    opportunity: buildOpportunity(business),
+    opportunityFilters: buildOpportunityFilters(business),
     reason: business.reason,
     recommendationStrength: business.recommendationStrength,
     recommendedAction: buildRecommendedAction(business.timingStage),
@@ -428,6 +431,47 @@ export function toCompany(business: BusinessListItem): Company {
     timingScore: business.timingScore,
     timingStage: business.timingStage,
   }
+}
+
+function buildOpportunity(business: BusinessListItem) {
+  const hasWebsiteMissing = business.digitalSignals.some(
+    (s) => s.signalName === 'website-missing',
+  )
+  const hasContact = business.digitalSignals.some(
+    (s) => s.signalName === 'business-contact-detected',
+  )
+
+  return {
+    contactDetected: hasContact,
+    digitalPresenceStatus: hasWebsiteMissing ? 'Website gap' : 'Presence detected',
+    opportunityFilters: buildOpportunityFilters(business),
+    opportunityReason: business.reason || 'New business with timing signals.',
+    websiteStatus: hasWebsiteMissing ? 'No website detected' : 'Website may exist',
+  }
+}
+
+function buildOpportunityFilters(business: BusinessListItem): readonly string[] {
+  const filters: string[] = []
+
+  if (business.digitalSignals.some((s) => s.signalName === 'website-missing')) {
+    filters.push('no-website-detected')
+  }
+
+  if (business.digitalSignals.some((s) => s.signalName === 'business-contact-detected')) {
+    filters.push('contact-detected')
+  }
+
+  if (business.timingScore >= 70) {
+    filters.push('high-confidence')
+  }
+
+  if (business.ageDays < 30) {
+    filters.push('new-entity-under-30-days')
+  }
+
+  filters.push('local-business')
+
+  return filters
 }
 
 export function buildIndustryEnrichmentPath(state: string, companyId: string): string {
@@ -451,7 +495,7 @@ export function buildBusinessDetailPath(
 }
 
 export function buildExportBusinessesPath(
-  query: Pick<ListBusinessesPageQuery, 'offeredService' | 'state'> | undefined,
+  query: Pick<ListBusinessesPageQuery, 'offeredService' | 'state' | 'opportunityFilters'> | undefined,
 ): string {
   const params = new URLSearchParams()
 
@@ -461,6 +505,10 @@ export function buildExportBusinessesPath(
 
   if (query?.offeredService !== undefined) {
     params.set('offeredService', query.offeredService)
+  }
+
+  if (query?.opportunityFilters && query.opportunityFilters.length > 0) {
+    params.set('opportunityFilters', query.opportunityFilters.join(','))
   }
 
   const queryString = params.toString()
@@ -579,6 +627,11 @@ export function buildBusinessesPath(query: ListBusinessesPageQuery): string {
   }
 
   addParam('minScore', query.minScore)
+
+  if (query.opportunityFilters && query.opportunityFilters.length > 0) {
+    addParam('opportunityFilters', query.opportunityFilters.join(','))
+  }
+
   addParam('offeredService', query.offeredService)
   addParam('limit', query.limit)
   addParam('offset', query.offset)
