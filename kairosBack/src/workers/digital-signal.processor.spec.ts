@@ -105,11 +105,11 @@ describe('DigitalSignalProcessor', () => {
 
     expect(jobDispatcher.timingScoreJobs).toEqual([
       { businessId: 'biz_1', offeredService: 'website-design-development' },
+      { businessId: 'biz_1', offeredService: 'landing-page-creation' },
       { businessId: 'biz_1', offeredService: 'branding' },
+      { businessId: 'biz_1', offeredService: 'logo-design' },
       { businessId: 'biz_1', offeredService: 'seo-local-seo' },
-      { businessId: 'biz_1', offeredService: 'paid-marketing' },
-      { businessId: 'biz_1', offeredService: 'social-media-marketing' },
-      { businessId: 'biz_1', offeredService: 'e-commerce-services' },
+      { businessId: 'biz_1', offeredService: 'google-business-profile-local-presence' },
     ]);
   });
 

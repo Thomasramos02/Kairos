@@ -2,11 +2,11 @@ import { OutreachSuggestionRequest } from '../models/outreach.model';
 
 const offeredServiceLabels = {
   'website-design-development': 'website design and development',
+  'landing-page-creation': 'a focused landing page',
   branding: 'brand clarity',
+  'logo-design': 'a clearer logo and visual identity',
   'seo-local-seo': 'local SEO',
-  'paid-marketing': 'paid marketing',
-  'social-media-marketing': 'social media marketing',
-  'e-commerce-services': 'e-commerce setup',
+  'google-business-profile-local-presence': 'Google Business Profile and local presence setup',
 } as const;
 
 const digitalSignalLabels = {

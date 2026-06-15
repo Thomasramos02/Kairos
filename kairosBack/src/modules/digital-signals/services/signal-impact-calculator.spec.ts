@@ -12,8 +12,8 @@ describe('calculateDigitalSignalImpact', () => {
 
   it('returns moderate impact for weak service matches', () => {
     const impactScore = calculateDigitalSignalImpact(
-      'website-missing',
-      'paid-marketing',
+      'online-store-recently-launched',
+      'logo-design',
     );
 
     expect(impactScore).toBe(40);

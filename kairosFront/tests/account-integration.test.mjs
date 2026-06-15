@@ -73,7 +73,7 @@ test('Kairos market target session preserves the offered service', () => {
   const parsedTarget = parseKairosMarketTargetSession(JSON.stringify({
     accountId: 'user_1',
     cityOrRegion: 'Miami',
-    desiredCustomerType: 'Agencies',
+    desiredCustomerType: 'Web designers',
     industry: 'Healthcare',
     offeredService: 'branding',
     state: 'FL',
@@ -126,6 +126,14 @@ test('business API rows map into dashboard companies with signals and timing', (
     id: 'biz_1',
     industry: 'Healthcare',
     name: 'Sunrise Clinic LLC',
+    opportunity: {
+      contactDetected: true,
+      digitalPresenceStatus: 'Minimal online presence',
+      opportunityFilters: ['no-website-detected', 'contact-detected'],
+      opportunityReason: 'No website is visible yet.',
+      websiteStatus: 'No website detected',
+    },
+    opportunityFilters: ['no-website-detected', 'contact-detected'],
     reason: '1 digital signal produced score 63 and stage warming-up.',
     recommendationStrength: 'relevant',
     registeredAt: '2026-06-01',
@@ -175,11 +183,12 @@ test('business list pagination builds server-side filter query params', () => {
       limit: 24,
       minScore: '70',
       offset: 48,
+      opportunityFilters: ['no-website-detected', 'contact-detected'],
       search: 'clinic',
       state: 'FL',
       timingStage: 'best-window',
     }),
-    '/businesses?state=FL&city=Miami&search=clinic&timingStage=best-window&minScore=70&offeredService=branding&limit=24&offset=48',
+    '/businesses?state=FL&city=Miami&search=clinic&timingStage=best-window&minScore=70&opportunityFilters=no-website-detected%2Ccontact-detected&offeredService=branding&limit=24&offset=48',
   )
 })
 
@@ -194,9 +203,10 @@ test('business export path follows selected state and service', () => {
   assert.equal(
     buildExportBusinessesPath({
       offeredService: 'seo-local-seo',
+      opportunityFilters: ['no-website-detected'],
       state: 'CT',
     }),
-    '/exports/businesses.csv?state=CT&offeredService=seo-local-seo',
+    '/exports/businesses.csv?state=CT&offeredService=seo-local-seo&opportunityFilters=no-website-detected',
   )
 })
 

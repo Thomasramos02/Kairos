@@ -72,10 +72,10 @@ export function buildServiceRecommendationLabel(
 export function formatOfferedServiceLabel(offeredService: OfferedService): string {
   const labels: Record<OfferedService, string> = {
     branding: 'branding',
-    'e-commerce-services': 'e-commerce',
-    'paid-marketing': 'paid marketing',
+    'google-business-profile-local-presence': 'Google Business Profile',
+    'landing-page-creation': 'landing pages',
+    'logo-design': 'logo design',
     'seo-local-seo': 'local SEO',
-    'social-media-marketing': 'social media',
     'website-design-development': 'website development',
   }
 
@@ -138,15 +138,19 @@ function formatPrimarySignal(
 
 const highImpactSignalKeys = new Set<string>([
   'website-missing:website-design-development',
+  'website-missing:landing-page-creation',
   'website-missing:branding',
+  'website-missing:logo-design',
   'domain-recently-registered:website-design-development',
+  'domain-recently-registered:landing-page-creation',
   'website-incomplete:seo-local-seo',
+  'website-incomplete:landing-page-creation',
   'local-presence-incomplete:seo-local-seo',
-  'social-presence-misaligned:social-media-marketing',
-  'social-profile-detected:social-media-marketing',
-  'online-store-recently-launched:e-commerce-services',
+  'local-presence-incomplete:google-business-profile-local-presence',
+  'social-presence-misaligned:branding',
+  'social-presence-misaligned:logo-design',
   'business-contact-detected:website-design-development',
   'business-contact-detected:seo-local-seo',
-  'business-contact-detected:paid-marketing',
-  'business-contact-detected:social-media-marketing',
+  'business-contact-detected:landing-page-creation',
+  'business-contact-detected:google-business-profile-local-presence',
 ])

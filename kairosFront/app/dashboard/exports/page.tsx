@@ -18,6 +18,10 @@ const exportFields = [
   { id: "industry", label: "Industry", checked: true },
   { id: "timing_stage", label: "Timing stage", checked: true },
   { id: "timing_score", label: "Timing score", checked: true },
+  { id: "website_status", label: "Website status", checked: true },
+  { id: "digital_presence_status", label: "Digital presence", checked: true },
+  { id: "contact_detected", label: "Contact detected", checked: true },
+  { id: "opportunity_filters", label: "Opportunity filters", checked: true },
   { id: "source", label: "Source", checked: true },
   {
     id: "recommendation_strength",

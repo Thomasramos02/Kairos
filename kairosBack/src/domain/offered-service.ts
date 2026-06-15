@@ -1,10 +1,10 @@
 export const offeredServices = [
   'website-design-development',
+  'landing-page-creation',
   'branding',
+  'logo-design',
   'seo-local-seo',
-  'paid-marketing',
-  'social-media-marketing',
-  'e-commerce-services',
+  'google-business-profile-local-presence',
 ] as const;
 
 export type OfferedService = (typeof offeredServices)[number];

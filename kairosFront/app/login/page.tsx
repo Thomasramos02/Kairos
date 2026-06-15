@@ -60,10 +60,6 @@ export default function LoginPage() {
     }
   }
 
-  const handleGoogleSignIn = async () => {
-    setErrors({ form: 'Google sign-in is not connected in the MVP backend yet.' })
-  }
-
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#F7F9FC]">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_12%_12%,rgba(37,99,235,0.15),transparent_28%),radial-gradient(circle_at_88%_18%,rgba(6,182,212,0.16),transparent_30%),linear-gradient(135deg,#F7F9FC_0%,#EEF6FB_48%,#F8FAFC_100%)]" />
@@ -92,25 +88,6 @@ export default function LoginPage() {
               </div>
 
               {errors.form && <FormError message={errors.form} />}
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleGoogleSignIn}
-                disabled={isLoading}
-                className="h-12 w-full rounded-xl border-border bg-white text-foreground hover:bg-slate-50"
-              >
-                <GoogleLogo />
-                Continue with Google
-              </Button>
-
-              <div className="my-6 flex items-center gap-3">
-                <div className="h-px flex-1 bg-border" />
-                <span className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
-                  or continue with email
-                </span>
-                <div className="h-px flex-1 bg-border" />
-              </div>
 
               <form noValidate onSubmit={handleSubmit} className="space-y-5">
                 <div className="space-y-2">
@@ -237,29 +214,6 @@ function FieldError({ id, message }: { id: string; message: string }) {
     <p id={id} className="text-sm text-destructive">
       {message}
     </p>
-  )
-}
-
-function GoogleLogo() {
-  return (
-    <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24">
-      <path
-        fill="#4285F4"
-        d="M22.6 12.2c0-.8-.1-1.6-.2-2.3H12v4.4h5.9c-.3 1.4-1 2.5-2.1 3.2v2.7h3.5c2-1.9 3.2-4.6 3.2-8z"
-      />
-      <path
-        fill="#34A853"
-        d="M12 23c2.9 0 5.3-1 7.1-2.6l-3.5-2.7c-1 .6-2.2 1-3.6 1-2.8 0-5.1-1.9-5.9-4.4H2.5v2.8C4.3 20.6 7.9 23 12 23z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M6.1 14.3c-.2-.6-.3-1.3-.3-2.1s.1-1.4.3-2.1V7.3H2.5C1.8 8.8 1.4 10.4 1.4 12.2s.4 3.4 1.1 4.9l3.6-2.8z"
-      />
-      <path
-        fill="#EA4335"
-        d="M12 5.6c1.6 0 3 .5 4.1 1.6l3.1-3.1C17.2 2.3 14.9 1 12 1 7.9 1 4.3 3.4 2.5 7.3l3.6 2.8C6.9 7.5 9.2 5.6 12 5.6z"
-      />
-    </svg>
   )
 }
 

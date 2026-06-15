@@ -51,6 +51,14 @@ function createCompany(
     timingStage: stage,
     timingScore,
     source,
+    opportunity: {
+      contactDetected: timingScore >= 60,
+      digitalPresenceStatus: 'Local presence gap',
+      opportunityFilters: buildSampleOpportunityFilters(ageInDays, timingScore),
+      opportunityReason: 'New local business with visible setup signals.',
+      websiteStatus: timingScore >= 70 ? 'No website detected' : 'Unknown website status',
+    },
+    opportunityFilters: buildSampleOpportunityFilters(ageInDays, timingScore),
     recommendedAction,
     scoreBreakdown: {
       ageWindow: Math.min(100, Math.max(0, timingScore - 10 + deterministicScore(id, 12))),
@@ -59,6 +67,17 @@ function createCompany(
       dataConfidence: deterministicScore(industry, 8, 2),
     },
   }
+}
+
+function buildSampleOpportunityFilters(
+  ageInDays: number,
+  timingScore: number,
+): readonly string[] {
+  return [
+    ...(timingScore >= 70 ? ['no-website-detected', 'high-confidence'] : []),
+    ...(ageInDays < 30 ? ['new-entity-under-30-days'] : []),
+    'local-business',
+  ]
 }
 
 export const sampleCompanies: Company[] = [

@@ -31,6 +31,7 @@ class FakeTimingScoresRepository {
     readonly minScore?: number;
     readonly offset?: number;
     readonly offeredService: OfferedService;
+    readonly opportunityFilters?: readonly string[];
     readonly search?: string;
     readonly state?: string;
     readonly timingStage?: string;
@@ -66,6 +67,7 @@ describe('BusinessesQueryService', () => {
     const page = await service.listNewBusinessesPage({
       limit: '1',
       offeredService: 'branding',
+      opportunityFilters: ['no-website-detected', 'contact-detected'],
       offset: '0',
       state: 'FL',
       timingStage: 'best-window',
@@ -74,6 +76,7 @@ describe('BusinessesQueryService', () => {
     expect(timingScoresRepository.queries[0]).toMatchObject({
       limit: 1,
       offeredService: 'branding',
+      opportunityFilters: ['no-website-detected', 'contact-detected'],
       offset: 0,
       state: 'FL',
       timingStage: 'best-window',
@@ -92,6 +95,11 @@ describe('BusinessesQueryService', () => {
       timingScore: 66,
       timingStage: 'warming-up',
     });
+    expect(page.items[0]?.opportunity).toMatchObject({
+      contactDetected: false,
+      websiteStatus: 'No website detected',
+    });
+    expect(page.items[0]?.opportunityFilters).toContain('no-website-detected');
     expect(page.items[0]?.digitalSignals).toHaveLength(1);
   });
 

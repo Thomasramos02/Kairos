@@ -266,6 +266,31 @@ function CompanyDetailContent() {
             </div>
           </Section>
 
+          <Section title="Digital opportunity">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <ContextMetric
+                label="Needs website?"
+                value={company.opportunity.websiteStatus}
+              />
+              <ContextMetric
+                label="Digital presence"
+                value={company.opportunity.digitalPresenceStatus}
+              />
+              <ContextMetric
+                label="Contactable"
+                value={
+                  company.opportunity.contactDetected
+                    ? "Contact detected"
+                    : "No contact yet"
+                }
+              />
+              <ContextMetric
+                label="Why now"
+                value={company.opportunity.opportunityReason}
+              />
+            </div>
+          </Section>
+
           <Section title="Timing analysis">
             <p className="text-sm text-muted-foreground">
               {company.reason ?? getTimingStageDescription(company.timingStage)}

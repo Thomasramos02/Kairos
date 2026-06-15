@@ -1,55 +1,49 @@
-import { Briefcase, Code, PenTool, UserRoundCheck, Users } from 'lucide-react'
+import { Globe2, MapPinned, Palette, PenTool } from 'lucide-react'
 
 const useCases = [
   {
-    icon: Briefcase,
-    title: 'Agencies',
-    description: 'Find newly opened businesses that may need websites, ads, CRM setup, local SEO, or operations help.',
-    example: 'Reach out to new roofing companies before they choose their first marketing supplier.',
-  },
-  {
-    icon: Users,
-    title: 'SDRs',
-    description: 'Prioritize fresh accounts by timing score instead of calling every new company the same way.',
-    example: 'Focus your day on companies entering Best Outreach Window and monitor those still warming up.',
+    icon: Globe2,
+    title: 'Web designers',
+    description: 'Find local businesses with no detected website or incomplete web presence.',
+    example: 'Offer a starter site when the business is still setting up its first customer touchpoints.',
   },
   {
     icon: PenTool,
-    title: 'Freelancers',
-    description: 'Spot businesses while they are still choosing vendors and offer focused setup help.',
-    example: 'Pitch launch websites, Google Business setup, or basic automation during the first month.',
+    title: 'Landing page builders',
+    description: 'Spot new entities that need a focused page before running ads or sending traffic.',
+    example: 'Pitch a simple lead capture page to service businesses under 30 days old.',
   },
   {
-    icon: UserRoundCheck,
-    title: 'Consultants',
-    description: 'Monitor companies that are likely to need supplier decisions, tooling, and process design.',
-    example: 'Start with a practical operations audit instead of a generic introduction.',
+    icon: Palette,
+    title: 'Logo and branding freelancers',
+    description: 'Find businesses still forming how they look, sound, and appear online.',
+    example: 'Use weak digital presence as context for a practical identity cleanup offer.',
   },
   {
-    icon: Code,
-    title: 'SaaS teams',
-    description: 'Find companies before their first software stack becomes fixed.',
-    example: 'Introduce scheduling, CRM, POS, or service software while operations are still being formed.',
+    icon: MapPinned,
+    title: 'Local SEO freelancers',
+    description: 'Prioritize businesses with local presence gaps and public contact signals.',
+    example: 'Lead with Google Business Profile cleanup for a newly opened clinic, studio, or service company.',
   },
 ]
 
 export function UseCasesSection() {
   return (
-    <section id="use-cases" className="py-20 lg:py-28">
+    <section id="use-cases" className="bg-white py-20 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground text-balance">
-            Built for outbound teams that need better timing
+            Built for freelancers selling digital presence
           </h2>
           <p className="mt-4 text-lg text-muted-foreground text-pretty">
-            Kairos is useful when your best customers are businesses that are still choosing
-            suppliers, tools, and operating partners.
+            Kairos is useful when your best customers are newly opened local businesses
+            still deciding how they will be found, trusted, and contacted online.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {useCases.map((useCase) => (
-            <div key={useCase.title} className="glass-card rounded-xl p-6 hover:shadow-lg transition-shadow">
+            <div key={useCase.title} className="rounded-lg border border-border bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-4">
                 <useCase.icon className="h-6 w-6 text-primary" />
               </div>

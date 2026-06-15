@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Search, SlidersHorizontal, X } from 'lucide-react'
 import { industries } from '@/lib/sample-data'
 import { usStateOptions } from '@/lib/us-state-options'
+import { type OpportunityFilter } from '@/lib/business-api'
 
 interface FiltersProps {
   onFilterChange?: (filters: FilterState) => void
@@ -25,6 +26,7 @@ export interface FilterState {
   industry: string
   timingStage: string
   minScore: string
+  opportunityFilters: readonly OpportunityFilter[]
 }
 
 const timingStages = [
@@ -36,6 +38,17 @@ const timingStages = [
   { value: 'old-lead', label: 'Old Lead' },
 ]
 
+const opportunityFilterOptions: readonly {
+  readonly label: string
+  readonly value: OpportunityFilter
+}[] = [
+  { label: 'No website detected', value: 'no-website-detected' },
+  { label: 'New entity under 30 days', value: 'new-entity-under-30-days' },
+  { label: 'Local business', value: 'local-business' },
+  { label: 'High confidence', value: 'high-confidence' },
+  { label: 'Contact detected', value: 'contact-detected' },
+]
+
 export function CompanyFilters({ onFilterChange }: FiltersProps) {
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [filters, setFilters] = useState<FilterState>({
@@ -45,10 +58,23 @@ export function CompanyFilters({ onFilterChange }: FiltersProps) {
     industry: 'all',
     timingStage: 'all',
     minScore: '',
+    opportunityFilters: [],
   })
 
   const updateFilter = (key: keyof FilterState, value: string) => {
     const newFilters = { ...filters, [key]: value }
+    setFilters(newFilters)
+    onFilterChange?.(newFilters)
+  }
+
+  const updateOpportunityFilter = (
+    currentFilters: FilterState,
+    value: OpportunityFilter,
+  ) => {
+    const newFilters = {
+      ...currentFilters,
+      opportunityFilters: toggleOpportunityFilter(currentFilters, value),
+    }
     setFilters(newFilters)
     onFilterChange?.(newFilters)
   }
@@ -61,6 +87,7 @@ export function CompanyFilters({ onFilterChange }: FiltersProps) {
       industry: 'all',
       timingStage: 'all',
       minScore: '',
+      opportunityFilters: [],
     }
     setFilters(clearedFilters)
     onFilterChange?.(clearedFilters)
@@ -72,7 +99,8 @@ export function CompanyFilters({ onFilterChange }: FiltersProps) {
     filters.city ||
     filters.industry !== 'all' ||
     filters.timingStage !== 'all' ||
-    filters.minScore
+    filters.minScore ||
+    filters.opportunityFilters.length > 0
 
   return (
     <div className="surface-card rounded-lg p-4 space-y-4">
@@ -127,6 +155,11 @@ export function CompanyFilters({ onFilterChange }: FiltersProps) {
           </Button>
         </div>
       </div>
+
+      <OpportunityFilterButtons
+        selectedFilters={filters.opportunityFilters}
+        onToggle={(value) => updateOpportunityFilter(filters, value)}
+      />
 
       {showAdvanced && (
         <div className="pt-4 border-t border-border">
@@ -185,4 +218,40 @@ export function CompanyFilters({ onFilterChange }: FiltersProps) {
       )}
     </div>
   )
+}
+
+function OpportunityFilterButtons({
+  onToggle,
+  selectedFilters,
+}: {
+  onToggle: (value: OpportunityFilter) => void
+  selectedFilters: readonly OpportunityFilter[]
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {opportunityFilterOptions.map((option) => (
+        <Button
+          key={option.value}
+          type="button"
+          variant={selectedFilters.includes(option.value) ? 'default' : 'outline'}
+          size="sm"
+          className="h-9"
+          onClick={() => onToggle(option.value)}
+        >
+          {option.label}
+        </Button>
+      ))}
+    </div>
+  )
+}
+
+function toggleOpportunityFilter(
+  filters: FilterState,
+  value: OpportunityFilter,
+): readonly OpportunityFilter[] {
+  if (filters.opportunityFilters.includes(value)) {
+    return filters.opportunityFilters.filter((filter) => filter !== value)
+  }
+
+  return [...filters.opportunityFilters, value]
 }

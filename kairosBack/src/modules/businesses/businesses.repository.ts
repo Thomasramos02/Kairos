@@ -416,9 +416,9 @@ function toStoredBusinessSignal(
 function buildServiceImpact(signalName: DigitalSignalName): string {
   const impactBySignal: Record<DigitalSignalName, string> = {
     "domain-recently-registered": "Fresh domain timing can support website or branding outreach.",
-    "local-presence-incomplete": "Local presence gaps can support SEO and listing cleanup.",
-    "online-store-recently-launched": "Store launch signals can support e-commerce services.",
-    "social-presence-misaligned": "Missing social presence can support social marketing outreach.",
+    "local-presence-incomplete": "Local presence gaps can support SEO and Google Business Profile cleanup.",
+    "online-store-recently-launched": "Store launch signals can support website or landing page services.",
+    "social-presence-misaligned": "Missing social presence can support branding or logo outreach.",
     "social-profile-detected": "Social profiles help verify brand presence and outreach context.",
     "website-incomplete": "Incomplete pages can support website, SEO, or branding services.",
     "website-missing": "No reachable site can support website or branding services.",

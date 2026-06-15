@@ -49,15 +49,20 @@ type OnboardingFields = {
 
 type OnboardingErrors = Partial<Record<keyof OnboardingFields | 'form', string>>
 
-const customerTypes = ['Agencies', 'SDRs', 'Freelancers', 'Consultants', 'SaaS teams']
+const customerTypes = [
+  'Web designers',
+  'Landing page builders',
+  'Logo and branding freelancers',
+  'Local SEO freelancers',
+]
 
 const offeredServiceLabels: Record<OfferedService, string> = {
   'website-design-development': 'Website design & development',
+  'landing-page-creation': 'Landing page creation',
   branding: 'Branding',
+  'logo-design': 'Logo design',
   'seo-local-seo': 'SEO / local SEO',
-  'paid-marketing': 'Paid marketing',
-  'social-media-marketing': 'Social media marketing',
-  'e-commerce-services': 'E-commerce services',
+  'google-business-profile-local-presence': 'Google Business Profile / local presence',
 }
 
 const initialFields: OnboardingFields = {

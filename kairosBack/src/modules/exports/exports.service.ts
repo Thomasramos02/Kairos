@@ -34,6 +34,10 @@ export class ExportsService {
       recommendationStrength: business.recommendationStrength,
       reason: business.reason,
       signalsCount: business.signalsCount,
+      websiteStatus: business.opportunity.websiteStatus,
+      digitalPresenceStatus: business.opportunity.digitalPresenceStatus,
+      contactDetected: business.opportunity.contactDetected,
+      opportunityFilters: business.opportunityFilters,
     }));
 
     return {
@@ -84,6 +88,10 @@ export class ExportsService {
         recommendationStrength: (business.recommendationStrength ?? 0).toString(),
         reason: business.reason ?? '',
         signalsCount: business.signalsCount ?? 0,
+        websiteStatus: 'Unknown website status',
+        digitalPresenceStatus: 'Presence not yet verified',
+        contactDetected: false,
+        opportunityFilters: [],
       };
     });
 

@@ -7,6 +7,10 @@ import {
   DigitalSignalMetadata,
   DigitalSignalName,
 } from '../../digital-signals/models/digital-signal.model';
+import {
+  BusinessOpportunitySummary,
+  OpportunityFilter,
+} from './business-opportunity.model';
 
 export type BusinessDigitalSignalSummary = {
   readonly signalName: DigitalSignalName;
@@ -33,6 +37,8 @@ export type BusinessListItem = {
   readonly timingStage: TimingStage;
   readonly timingScore: number;
   readonly reason: string;
+  readonly opportunity: BusinessOpportunitySummary;
+  readonly opportunityFilters: readonly OpportunityFilter[];
 };
 
 export type PaginatedBusinessList = {

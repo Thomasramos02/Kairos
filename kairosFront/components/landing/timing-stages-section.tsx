@@ -44,7 +44,7 @@ export function TimingStagesSection() {
   ]
 
   return (
-    <section className="py-20 lg:py-28 bg-muted/30">
+    <section className="bg-muted/30 py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground text-balance">
@@ -56,23 +56,20 @@ export function TimingStagesSection() {
           </p>
         </div>
 
-        {/* Timeline */}
         <div className="relative max-w-5xl mx-auto">
-          {/* Progress bar */}
           <div className="hidden md:block absolute top-8 left-0 right-0 h-1 bg-border rounded-full">
-            <div className="absolute left-0 h-full w-[58%] bg-gradient-to-r from-[#94A3B8] via-[#F59E0B] to-[#10B981] rounded-full" />
+            <div className="absolute left-0 h-full w-[58%] rounded-full bg-primary" />
           </div>
 
           <div className="grid md:grid-cols-5 gap-6">
-            {stages.map((stage, index) => (
+            {stages.map((stage) => (
               <div key={stage.name} className="relative">
-                {/* Dot on timeline */}
                 <div className="hidden md:flex justify-center mb-6">
                   <div className={`h-4 w-4 rounded-full ${stage.dotColor} ring-4 ring-background`} />
                 </div>
 
                 <div 
-                  className={`rounded-xl p-5 border ${stage.color} ${stage.highlight ? 'ring-2 ring-[#10B981] ring-offset-2' : ''}`}
+                  className={`rounded-lg p-5 border shadow-sm ${stage.color} ${stage.highlight ? 'ring-2 ring-[#10B981] ring-offset-2' : ''}`}
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <div className={`h-2 w-2 rounded-full ${stage.dotColor}`} />

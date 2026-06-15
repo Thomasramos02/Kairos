@@ -11,7 +11,7 @@ O foco e orientar layout, hierarquia, interacoes e comportamento de tela. Os tok
 - idioma principal da interface: ingles;
 - moeda e precos em dolar;
 - foco inicial em um estado americano;
-- comunicacao voltada a prospeccao B2B;
+- comunicacao voltada a web designers, landing page builders, freelancers de logo/branding e freelancers de local SEO;
 - interface precisa parecer uma ferramenta profissional de inteligencia comercial.
 
 ## 3. Direcao De UX
@@ -29,6 +29,7 @@ O usuario precisa entender em poucos segundos:
 - quais empresas sao novas;
 - em que fase estao;
 - por que aparecem ali;
+- qual oportunidade digital existe;
 - qual acao faz sentido agora.
 
 ## 4. Arquitetura Da Interface
@@ -59,15 +60,31 @@ Padrao recomendado:
 Objetivo:
 
 - explicar o valor rapidamente;
+- atrair profissionais que vendem site, landing page, branding e local SEO;
 - conduzir para waitlist, login ou acesso.
 
 Elementos essenciais:
 
-- headline direta;
-- subheadline sobre timing comercial;
-- exemplo visual de empresa em fase;
+- headline direta para o nicho;
+- subheadline sobre encontrar negocios locais novos que ainda precisam de presenca digital;
+- exemplo visual de empresa em fase com oportunidade digital;
+- cards demonstrando website status, presenca digital, contato e motivo de abordagem;
 - CTA principal;
 - prova conceitual do fluxo.
+
+Mensagem recomendada para primeira versao:
+
+- headline: Find newly opened local businesses before they fix their online presence.
+- subheadline: Kairos helps web designers, landing page builders, branding freelancers, and local SEO freelancers spot businesses with missing websites, weak local presence, and fresh timing signals.
+- CTA: Join the waitlist.
+
+A landing page deve priorizar atracao e clareza:
+
+- mostrar o nicho no primeiro viewport;
+- explicar que o produto encontra empresas novas, nao leads genericos;
+- destacar filtros como No website detected e New entity under 30 days;
+- mostrar um exemplo concreto de abordagem consultiva;
+- evitar promessa de contato perfeito, compra garantida ou automacao de spam.
 
 ### 5.2 Login e cadastro
 
@@ -95,6 +112,7 @@ Campos:
 - state;
 - city or region;
 - target industry;
+- service sold;
 - alert channel;
 - alert frequency.
 
@@ -108,9 +126,20 @@ Elementos:
 
 - resumo por fase;
 - filtros;
+- filtros por oportunidade;
 - ordenacao por score;
 - lista ou tabela principal;
 - acoes rapidas para salvar e copiar abordagem.
+
+Filtros por oportunidade:
+
+- No website detected;
+- New entity under 30 days;
+- Local business;
+- High confidence;
+- Contact detected.
+
+Esses filtros devem aparecer como controles rapidos e combinaveis. A interface deve mostrar quando um filtro reduz a lista por falta de confianca, fonte limitada ou ausencia de sinal.
 
 ### 5.5 Detalhe da empresa
 
@@ -129,6 +158,10 @@ Conteudo esperado:
 - source;
 - timing stage;
 - timing score;
+- website status;
+- digital presence status;
+- contact detected;
+- opportunity reason;
 - reason;
 - recommended action;
 - contactability;
@@ -155,6 +188,27 @@ Objetivo:
 - mantenha acao principal visivel;
 - use badges e labels para fase;
 - permita detalhes sem perder contexto.
+
+### 6.1.1 Cards de empresas
+
+Cards devem ser desenhados para responder quatro perguntas antes de qualquer detalhe longo:
+
+- precisa de site?
+- tem presenca digital?
+- da para contactar?
+- por que abordar agora?
+
+Estrutura recomendada do card:
+
+- nome, cidade, estado e idade da empresa;
+- badges de oportunidade, como No website detected, Local business e High confidence;
+- bloco curto de website status;
+- bloco curto de presenca digital;
+- bloco curto de contato detectado;
+- frase de motivo para abordar agora;
+- acoes para salvar, copiar abordagem e abrir detalhes.
+
+O card nao deve parecer um registro de CRM. Ele deve parecer uma leitura de oportunidade para alguem que vende presenca digital.
 
 ### 6.2 Feedback
 

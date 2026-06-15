@@ -4,11 +4,11 @@ export type AlertFrequency = 'daily' | 'weekly' | 'phase-change'
 
 export type OfferedService =
   | 'website-design-development'
+  | 'landing-page-creation'
   | 'branding'
+  | 'logo-design'
   | 'seo-local-seo'
-  | 'paid-marketing'
-  | 'social-media-marketing'
-  | 'e-commerce-services'
+  | 'google-business-profile-local-presence'
 
 export type AlertPreference = {
   readonly channels: readonly AlertChannel[]

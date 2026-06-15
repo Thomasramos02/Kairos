@@ -37,45 +37,49 @@ const signalGroupCaps: Record<SignalGroup, number> = {
 const signalWeightRules: readonly SignalWeightRule[] = [
   signalRule('website-missing', 'website', {
     branding: 24,
+    'landing-page-creation': 28,
+    'logo-design': 18,
     'website-design-development': 30,
   }),
   signalRule('website-incomplete', 'website', {
+    'landing-page-creation': 24,
     'seo-local-seo': 24,
     'website-design-development': 28,
   }),
   signalRule('domain-recently-registered', 'domain', {
     branding: 14,
+    'landing-page-creation': 16,
+    'logo-design': 12,
     'website-design-development': 16,
   }),
   signalRule('local-presence-incomplete', 'local', {
+    'google-business-profile-local-presence': 28,
     'seo-local-seo': 26,
-    'social-media-marketing': 14,
   }),
   signalRule('social-presence-misaligned', 'social', {
     branding: 10,
-    'social-media-marketing': 26,
+    'logo-design': 10,
   }),
   signalRule('social-profile-detected', 'social', {
-    'paid-marketing': 12,
-    'social-media-marketing': 16,
+    branding: 8,
+    'logo-design': 8,
   }),
   signalRule('online-store-recently-launched', 'commerce', {
-    'e-commerce-services': 30,
-    'paid-marketing': 14,
+    'landing-page-creation': 12,
+    'website-design-development': 14,
   }),
   signalRule('website-technology-detected', 'technology', {
-    'e-commerce-services': 18,
     'seo-local-seo': 12,
     'website-design-development': 12,
   }),
   signalRule('business-contact-detected', 'contact', {
-  'seo-local-seo': 8,
-  'social-media-marketing': 8,
-  'paid-marketing': 10,
-  'e-commerce-services': 8,
-  'website-design-development': 6,
-  branding: 6,
-}),
+    'google-business-profile-local-presence': 8,
+    'landing-page-creation': 6,
+    'seo-local-seo': 8,
+    'website-design-development': 6,
+    branding: 6,
+    'logo-design': 6,
+  }),
 ];
 
 export function calculateTimingScore(

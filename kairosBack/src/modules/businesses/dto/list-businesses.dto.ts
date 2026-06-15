@@ -8,6 +8,7 @@ export type ListBusinessesQuery = {
   readonly search?: string;
   readonly timingStage?: TimingStage;
   readonly minScore?: string;
+  readonly opportunityFilters?: string | readonly string[];
   readonly offeredService?: OfferedService;
 };
 

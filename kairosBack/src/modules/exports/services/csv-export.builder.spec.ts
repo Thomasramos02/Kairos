@@ -18,10 +18,15 @@ describe('buildBusinessesCsv', () => {
         recommendationStrength: 'relevant',
         reason: 'New business',
         signalsCount: 2,
+        websiteStatus: 'No website detected',
+        digitalPresenceStatus: 'Minimal online presence',
+        contactDetected: true,
+        opportunityFilters: ['no-website-detected', 'contact-detected'],
       },
     ]);
 
     expect(csv).toContain('id,source_document_number,company_name,registered_at,age_days');
+    expect(csv).toContain('website_status,digital_presence_status,contact_detected');
     expect(csv).toContain('Sunrise Bakery LLC');
   });
 
@@ -42,6 +47,10 @@ describe('buildBusinessesCsv', () => {
         recommendationStrength: 'relevant',
         reason: 'reason',
         signalsCount: 0,
+        websiteStatus: 'Unknown website status',
+        digitalPresenceStatus: 'Presence not yet verified',
+        contactDetected: false,
+        opportunityFilters: [],
       },
     ]);
 

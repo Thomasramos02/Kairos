@@ -13,6 +13,10 @@ export type CsvExportRow = {
   readonly recommendationStrength: string;
   readonly reason: string;
   readonly signalsCount: number;
+  readonly websiteStatus: string;
+  readonly digitalPresenceStatus: string;
+  readonly contactDetected: boolean;
+  readonly opportunityFilters: readonly string[];
 };
 
 export type CsvExportResponse = {

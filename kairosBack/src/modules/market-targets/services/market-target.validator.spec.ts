@@ -46,7 +46,7 @@ describe('assertCreateMarketTargetRequest', () => {
     expect(() =>
       assertCreateMarketTargetRequest({
         country: 'US',
-        desiredCustomerType: 'Agencies',
+        desiredCustomerType: 'Web designers',
         industry: 'Healthcare',
         offeredService: 'website-design-development',
         state: 'GA',

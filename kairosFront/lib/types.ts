@@ -21,6 +21,14 @@ export interface Company {
   source: string
   industryEnrichment?: CorporateIndustryEnrichment | null
   reason?: string
+  opportunity: {
+    readonly contactDetected: boolean
+    readonly digitalPresenceStatus: string
+    readonly opportunityFilters: readonly string[]
+    readonly opportunityReason: string
+    readonly websiteStatus: string
+  }
+  opportunityFilters: readonly string[]
   digitalSignals?: readonly {
     readonly signalName: string
     readonly sourceName: string

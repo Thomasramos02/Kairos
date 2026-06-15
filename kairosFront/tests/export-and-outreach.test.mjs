@@ -22,6 +22,10 @@ const requiredCsvFields = [
   'industry',
   'timing_stage',
   'timing_score',
+  'website_status',
+  'digital_presence_status',
+  'contact_detected',
+  'opportunity_filters',
   'source',
 ]
 
@@ -134,7 +138,7 @@ test('service recommendation highlights strong matches from backend strength', (
   const label = buildServiceRecommendationLabel({
     ...sampleCompanies[0],
     recommendationStrength: 'strong-match',
-  }, 'social-media-marketing')
+  }, 'logo-design')
 
-  assert.equal(label, 'Strong match for social media')
+  assert.equal(label, 'Strong match for logo design')
 })

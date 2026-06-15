@@ -42,6 +42,10 @@ export function companyToCsvRow(company: Company) {
     industry: company.industry,
     timing_stage: getTimingStageLabel(company.timingStage),
     timing_score: String(company.timingScore),
+    website_status: company.opportunity.websiteStatus,
+    digital_presence_status: company.opportunity.digitalPresenceStatus,
+    contact_detected: String(company.opportunity.contactDetected),
+    opportunity_filters: company.opportunityFilters.join('|'),
     recommended_action: company.recommendedAction,
     source: company.source,
   }

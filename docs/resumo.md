@@ -2,7 +2,7 @@
 
 ## 1. Visao Geral
 
-O Kairos e uma plataforma de inteligencia de timing comercial para prospeccao B2B.
+O Kairos e uma plataforma de inteligencia de timing comercial para freelancers e pequenos estudios que vendem presenca digital para negocios locais recem-abertos.
 
 Em vez de funcionar como uma base generica de empresas, o produto existe para descobrir negocios recem-abertos, acompanhar sua maturacao e indicar quando a abordagem comercial tende a fazer mais sentido.
 
@@ -16,16 +16,17 @@ Frase em ingles para a interface:
 
 ## 2. Problema Que O Produto Resolve
 
-Times comerciais gastam tempo demais procurando leads e pouco tempo atuando no momento certo.
+Web designers, landing page builders, freelancers de logo/branding e freelancers de local SEO gastam tempo demais procurando negocios novos e pouco tempo entendendo quais deles realmente parecem prontos para uma abordagem.
 
 O mercado atual costuma oferecer:
 
 - bases amplas de empresas;
 - listas desatualizadas;
 - sinais isolados, sem leitura temporal;
-- abordagens frias em contatos que ainda nao estao prontos.
+- abordagens frias em negocios que ainda nao mostram necessidade clara;
+- pouca explicacao sobre presenca digital, contato e urgencia.
 
-O Kairos resolve esse problema ao combinar descoberta antecipada, sinais de oportunidade e leitura de fase comercial.
+O Kairos resolve esse problema ao combinar descoberta antecipada, sinais de oportunidade digital e leitura de fase comercial.
 
 ## 3. Hipotese Do Produto
 
@@ -36,26 +37,25 @@ A hipotese do Kairos e simples:
 3. Relevancia importa mais que chegar primeiro.
 4. A melhor janela pode acontecer semanas depois do registro, nao necessariamente no primeiro dia.
 
-O produto nao promete prever compra. Ele ajuda o usuario a responder quando a solucao que ele vende parece se tornar relevante para aquela empresa.
+O produto nao promete prever compra. Ele ajuda o usuario a responder quando uma oferta de site, landing page, identidade visual ou local SEO parece se tornar relevante para aquela empresa.
 
 ## 4. Para Quem E
 
-O produto e mais util para quem vende para empresas que estao se estruturando agora:
+O produto e feito primeiro para profissionais que vendem presenca digital para negocios locais que estao se estruturando agora:
 
-- agencias de marketing;
-- freelancers de sites e desenvolvimento;
-- escritorios de contabilidade;
-- empresas de software B2B;
-- times de vendas e outbound.
+- web designers;
+- landing page builders;
+- freelancers de logo e branding;
+- freelancers de local SEO.
 
-Esses perfis se beneficiam porque costumam valorizar empresas novas, proximas de tomar decisoes de fornecedor.
+Esses perfis se beneficiam porque empresas novas costumam precisar decidir cedo como vao parecer, ser encontradas e ser contactadas online.
 
 ## 5. Proposta De Valor
 
 O Kairos entrega tres coisas ao mesmo tempo:
 
 - descoberta antecipada;
-- sinais iniciais de oportunidade;
+- sinais iniciais de oportunidade digital;
 - acompanhamento da evolucao da empresa;
 - indicacao de janela comercial.
 
@@ -76,6 +76,13 @@ O Kairos responde:
 - quando a oferta do usuario parece mais relevante;
 - por que essa recomendacao existe.
 
+Para esse nicho, a recomendacao deve responder:
+
+- precisa de site ou landing page?
+- tem presenca digital minima?
+- da para contactar?
+- por que abordar agora?
+
 ## 7. Mercado Inicial
 
 A validacao inicial aponta maior aderencia no mercado internacional, especialmente nos Estados Unidos.
@@ -87,7 +94,7 @@ Direcao inicial:
 - Rhode Island como proxima cobertura candidata;
 - Florida, Seattle, Oregon e Iowa como experimentos separados;
 - filtros por estado, cidade e segmento conforme confiabilidade da fonte;
-- comunicacao voltada a prospeccao B2B.
+- comunicacao voltada a prospeccao consultiva para web design, landing pages, branding e local SEO.
 
 Posicionamento do beta:
 
@@ -100,6 +107,7 @@ O produto deve cobrir:
 - descoberta de empresas novas;
 - calculo de idade e fase;
 - ranking por prontidao de abordagem;
+- filtros por oportunidade digital;
 - watchlist;
 - alertas;
 - exportacao;

@@ -3,9 +3,10 @@ import { SQL, and, asc, desc, eq, gte, ilike, or, sql } from 'drizzle-orm';
 import { createInMemoryId } from '../../common/in-memory-id';
 import { DRIZZLE_DATABASE } from '../../database/database.tokens';
 import { DrizzleDatabase } from '../../database/drizzle.provider';
-import { businesses, timingScores } from '../../database/schema';
+import { businesses, digitalSignals, timingScores } from '../../database/schema';
 import { OfferedService } from '../../domain/offered-service';
 import { TimingStage } from '../../domain/timing-stage';
+import type { OpportunityFilter } from '../businesses/models/business-opportunity.model';
 
 const initialFallbackTimingRank = 1;
 const initialFallbackTimingScore = 45;
@@ -53,6 +54,7 @@ export type RankedBusinessesPageQuery = {
   readonly timingStage?: TimingStage;
   readonly minScore?: number;
   readonly offeredService: OfferedService;
+  readonly opportunityFilters?: readonly OpportunityFilter[];
   readonly limit?: number;
   readonly offset?: number;
 };
@@ -248,6 +250,10 @@ function buildRankedBusinessConditions(query: RankedBusinessesPageQuery) {
     );
   }
 
+  for (const filter of query.opportunityFilters ?? []) {
+    conditions.push(buildOpportunityFilterCondition(filter));
+  }
+
   if (query.search !== undefined && query.search.trim().length > 0) {
     const search = `%${query.search.trim()}%`;
     conditions.push(
@@ -260,6 +266,34 @@ function buildRankedBusinessConditions(query: RankedBusinessesPageQuery) {
   }
 
   return conditions;
+}
+
+function buildOpportunityFilterCondition(filter: OpportunityFilter): SQL {
+  if (filter === 'no-website-detected') {
+    return businessSignalExistsCondition('website-missing');
+  }
+
+  if (filter === 'new-entity-under-30-days') {
+    return sql<boolean>`${businesses.registeredAt} >= now() - interval '30 days'`;
+  }
+
+  if (filter === 'local-business') {
+    return sql<boolean>`${businesses.city} is not null and lower(${businesses.industry}) <> 'unclassified'`;
+  }
+
+  if (filter === 'high-confidence') {
+    return sql<boolean>`coalesce(${timingScores.timingScore}, ${initialFallbackTimingScore}) >= 70`;
+  }
+
+  return businessSignalExistsCondition('business-contact-detected');
+}
+
+function businessSignalExistsCondition(signalName: string): SQL {
+  return sql<boolean>`exists (
+    select 1 from ${digitalSignals}
+    where ${digitalSignals.businessId} = ${businesses.id}
+      and ${digitalSignals.signalName} = ${signalName}
+  )`;
 }
 
 function toRankedBusinessListRow(

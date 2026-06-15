@@ -4,9 +4,9 @@ import { Toaster } from '@/components/ui/toaster'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Kairos - Timing Intelligence for B2B Sales',
-  description: 'Discover newly registered businesses early. Reach out when timing is right. Kairos helps B2B teams track new businesses from registration to the best outreach window.',
-  keywords: ['B2B sales', 'lead generation', 'timing intelligence', 'new businesses', 'outreach'],
+  title: 'Kairos - New Local Business Opportunities',
+  description: 'Find newly opened local businesses with missing websites, weak digital presence, public contacts, and fresh timing signals.',
+  keywords: ['web design leads', 'landing page leads', 'local SEO leads', 'new local businesses', 'branding leads'],
 }
 
 export const viewport: Viewport = {

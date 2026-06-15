@@ -37,13 +37,15 @@ test('alerts page keeps email and Telegram as MVP channels and marks webhook as 
 test('exports page includes source as a selected minimum CSV field', () => {
   const source = readProjectFile('app/dashboard/exports/page.tsx')
 
-  assert.match(source, /\{ id: 'source', label: 'Source', checked: true \}/)
-  assert.match(source, /exportKairosBusinessesCsv/)
+  assert.match(source, /\{ id: ["']source["'], label: ["']Source["'], checked: true \}/)
+  assert.match(source, /website_status/)
+  assert.match(source, /opportunity_filters/)
+  assert.match(source, /exportKairosWatchlistCsv/)
   assert.match(source, /Export includes all required MVP fields/)
 })
 
 test('company detail page includes required recommendation context', () => {
-  const source = readProjectFile('app/dashboard/company/[id]/page.tsx')
+  const source = readProjectFile('app/dashboard/company/page.tsx')
 
   for (const label of [
     'Registered Date',
@@ -54,6 +56,9 @@ test('company detail page includes required recommendation context', () => {
     'Source',
     'Timing Score Breakdown',
     'Contact options',
+    'Digital opportunity',
+    'Needs website?',
+    'Digital presence',
     'Recommended Action',
     'Why this is relevant',
     'Suggested Outreach',
@@ -71,16 +76,22 @@ test('service dropdown labels use polished service names', () => {
   const settingsSource = readProjectFile('app/dashboard/settings/page.tsx')
 
   assert.match(onboardingSource, /Website design & development/)
+  assert.match(onboardingSource, /Landing page creation/)
+  assert.match(onboardingSource, /Logo design/)
   assert.match(onboardingSource, /SEO \/ local SEO/)
   assert.match(settingsSource, /Website design & development/)
+  assert.match(settingsSource, /Google Business Profile \/ local presence/)
   assert.match(settingsSource, /SEO \/ local SEO/)
 })
 
-test('new business card keeps detail-heavy data out of the list view', () => {
+test('new business card exposes opportunity summary without backend detail panes', () => {
   const source = readProjectFile('components/dashboard/company-card.tsx')
 
   assert.match(source, /Details/)
   assert.match(source, /Timing Score/)
+  assert.match(source, /Needs website\?/)
+  assert.match(source, /Digital presence\?/)
+  assert.match(source, /Contactable\?/)
   assert.doesNotMatch(source, /CompanyIndustryEnrichment/)
   assert.doesNotMatch(source, /buildCompanyScoreMetrics/)
   assert.doesNotMatch(source, /formatDigitalSignalName/)

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import type { ComponentType } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Bookmark,
@@ -8,8 +9,11 @@ import {
   Calendar,
   Check,
   Eye,
+  Globe2,
   Mail,
   MapPin,
+  MessageSquareText,
+  SearchCheck,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -29,11 +33,18 @@ import { TimingBadge } from "./timing-badge";
 
 interface CompanyCardProps {
   company: Company;
+  initiallySaved?: boolean;
   offeredService: OfferedService;
+  onSaved?: (businessId: string) => void;
 }
 
-export function CompanyCard({ company, offeredService }: CompanyCardProps) {
-  const [saved, setSaved] = useState(false);
+export function CompanyCard({
+  company,
+  initiallySaved = false,
+  offeredService,
+  onSaved,
+}: CompanyCardProps) {
+  const [saved, setSaved] = useState(initiallySaved);
   const [isSaving, setIsSaving] = useState(false);
   const [copied, setCopied] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -43,6 +54,10 @@ export function CompanyCard({ company, offeredService }: CompanyCardProps) {
     offeredService,
   );
   const formattedDate = formatRegisteredDate(company.registeredDate);
+
+  useEffect(() => {
+    setSaved(initiallySaved);
+  }, [initiallySaved]);
 
   const handleCopyOutreach = async () => {
     const session = readKairosAccountSession();
@@ -84,6 +99,7 @@ export function CompanyCard({ company, offeredService }: CompanyCardProps) {
         company.id,
       );
       setSaved(true);
+      onSaved?.(company.id);
       setSaveError(null);
     } catch (error) {
       setSaveError(formatCompanyCardError(error));
@@ -93,12 +109,13 @@ export function CompanyCard({ company, offeredService }: CompanyCardProps) {
   };
 
   return (
-    <article className="surface-card rounded-xl border border-border p-4 transition-colors hover:border-primary/30">
+    <article className="surface-card rounded-lg border border-border p-4 transition-colors hover:border-primary/30">
       <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center">
         <div className="min-w-0">
           <CompanyCardHeader company={company} />
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <TimingBadge stage={company.timingStage} size="sm" />
+            <OpportunityBadges filters={company.opportunityFilters} />
             <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
               {serviceRecommendation}
             </span>
@@ -109,6 +126,7 @@ export function CompanyCard({ company, offeredService }: CompanyCardProps) {
           <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">
             {recommendation.actionLabel}: {recommendation.whyNow}
           </p>
+          <OpportunitySnapshot company={company} />
           {saveError && (
             <p className="mt-3 text-sm text-destructive">{saveError}</p>
           )}
@@ -127,6 +145,70 @@ export function CompanyCard({ company, offeredService }: CompanyCardProps) {
         </div>
       </div>
     </article>
+  );
+}
+
+function OpportunityBadges({ filters }: { filters: readonly string[] }) {
+  return (
+    <>
+      {filters.slice(0, 3).map((filter) => (
+        <span
+          key={filter}
+          className="rounded-full border border-border bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground"
+        >
+          {formatOpportunityFilter(filter)}
+        </span>
+      ))}
+    </>
+  );
+}
+
+function OpportunitySnapshot({ company }: { company: Company }) {
+  const opportunity = company.opportunity;
+
+  return (
+    <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+      <OpportunityFact
+        icon={Globe2}
+        label="Needs website?"
+        value={opportunity.websiteStatus}
+      />
+      <OpportunityFact
+        icon={SearchCheck}
+        label="Digital presence?"
+        value={opportunity.digitalPresenceStatus}
+      />
+      <OpportunityFact
+        icon={Mail}
+        label="Contactable?"
+        value={opportunity.contactDetected ? "Contact detected" : "No contact yet"}
+      />
+      <OpportunityFact
+        icon={MessageSquareText}
+        label="Why now?"
+        value={opportunity.opportunityReason}
+      />
+    </div>
+  );
+}
+
+function OpportunityFact({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="rounded-lg border border-border bg-muted/35 p-3">
+      <div className="mb-2 flex items-center gap-2 text-xs font-medium text-muted-foreground">
+        <Icon className="h-3.5 w-3.5" />
+        {label}
+      </div>
+      <p className="line-clamp-2 text-sm font-medium text-foreground">{value}</p>
+    </div>
   );
 }
 
@@ -247,6 +329,18 @@ function formatRegisteredDate(date: Date): string {
     month: "short",
     year: "numeric",
   });
+}
+
+function formatOpportunityFilter(filter: string): string {
+  const labels: Record<string, string> = {
+    "contact-detected": "Contact detected",
+    "high-confidence": "High confidence",
+    "local-business": "Local business",
+    "new-entity-under-30-days": "New entity under 30 days",
+    "no-website-detected": "No website detected",
+  };
+
+  return labels[filter] ?? filter;
 }
 
 function formatCompanyCardError(error: unknown): string {

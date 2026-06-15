@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { OfferedService } from '../../domain/offered-service';
 import { ListBusinessesPageQuery, ListBusinessesQuery } from './dto/list-businesses.dto';
 import {
@@ -9,6 +9,11 @@ import { BusinessListItem, PaginatedBusinessList } from './models/business-list.
 import { calculateBusinessAgeDays } from './services/business-age-calculator';
 import { TimingScoresRepository, RankedBusinessListRow } from '../timing/timing-scores.repository';
 import { calculateTimingScore } from '../timing/services/timing-score-calculator';
+import {
+  buildBusinessOpportunitySummary,
+  isOpportunityFilter,
+} from './models/business-opportunity.model';
+import type { OpportunityFilter } from './models/business-opportunity.model';
 
 @Injectable()
 export class BusinessesQueryService {
@@ -28,6 +33,7 @@ export class BusinessesQueryService {
         industry: query.industry,
         minScore: parseMinScore(query.minScore),
         offeredService,
+        opportunityFilters: parseOpportunityFilters(query.opportunityFilters),
         search: query.search,
         state: query.state,
         timingStage: query.timingStage,
@@ -52,6 +58,7 @@ export class BusinessesQueryService {
         minScore: parseMinScore(query.minScore),
         offset,
         offeredService,
+        opportunityFilters: parseOpportunityFilters(query.opportunityFilters),
         search: query.search,
         state: query.state,
         timingStage: query.timingStage,
@@ -138,6 +145,13 @@ function toBusinessListItem(
     signals,
     sourceName: row.source,
   });
+  const opportunity = buildBusinessOpportunitySummary({
+    ageDays,
+    city: row.city,
+    industry: row.industry,
+    signals,
+    timingScore: scoreExplanation.timingScore,
+  });
 
   return {
     ageDays,
@@ -152,6 +166,8 @@ function toBusinessListItem(
     id: row.businessId,
     industry: row.industry,
     name: row.name,
+    opportunity,
+    opportunityFilters: opportunity.opportunityFilters,
     reason: scoreExplanation.reason,
     recommendationStrength: scoreExplanation.recommendationStrength,
     registeredAt,
@@ -163,6 +179,28 @@ function toBusinessListItem(
     timingScore: scoreExplanation.timingScore,
     timingStage: scoreExplanation.timingStage,
   };
+}
+
+function parseOpportunityFilters(
+  value: string | readonly string[] | undefined,
+): readonly OpportunityFilter[] | undefined {
+  if (value === undefined) return undefined;
+  const values = typeof value === 'string' ? value.split(',') : value;
+  return values
+    .filter((item: string) => item.trim().length > 0)
+    .map(parseOpportunityFilter);
+}
+
+function parseOpportunityFilter(value: string): OpportunityFilter {
+  const filter = value.trim();
+
+  if (isOpportunityFilter(filter)) {
+    return filter;
+  }
+
+  throw new BadRequestException(
+    `Invalid opportunityFilters: received "${value}"; expected supported opportunity filter`,
+  );
 }
 
 function parseMinScore(value: string | undefined): number | undefined {

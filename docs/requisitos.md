@@ -7,11 +7,11 @@ Este documento define apenas requisitos funcionais e nao funcionais do MVP.
 Ele nao descreve posicionamento de produto, design visual ou fluxo de prototipacao.
 Detalhes de integracao, arquitetura e validacao operacional ficam em `docs/backend-mvp-florida.md` e `docs/arquitetura-backend.md`.
 
-O MVP deve provar que Kairos e uma ferramenta de Timing Intelligence, nao uma base generica de empresas. Cada requisito deve favorecer acao, contexto e leitura de oportunidade.
+O MVP deve provar que Kairos e uma ferramenta de Timing Intelligence para profissionais que vendem presenca digital, nao uma base generica de empresas. Cada requisito deve favorecer acao, contexto e leitura de oportunidade.
 
 Pergunta central do produto:
 
-**Quando a solucao do usuario se torna relevante para esta empresa?**
+**Quando uma oferta de site, landing page, branding ou local SEO se torna relevante para esta empresa?**
 
 ## 2. Requisitos Funcionais
 
@@ -52,11 +52,11 @@ Essa resposta deve influenciar score, timing, sinais relevantes e sugestao de ab
 Servicos iniciais:
 
 - website design/development;
+- landing page creation;
 - branding;
+- logo design;
 - SEO/local SEO;
-- paid marketing;
-- social media marketing;
-- e-commerce services.
+- Google Business Profile/local presence.
 
 ### RF03.1 - Cobertura confiavel por fonte
 
@@ -102,7 +102,32 @@ Cada item deve exibir, no minimo:
 - fonte;
 - principais sinais digitais encontrados;
 - fase de timing;
-- Timing Score.
+- Timing Score;
+- website status;
+- presenca digital;
+- contato detectado;
+- motivo para abordar agora.
+
+Cada card de empresa deve responder de forma escaneavel:
+
+- precisa de site?
+- tem presenca digital?
+- da para contactar?
+- por que abordar agora?
+
+### RF04.1 - Filtrar por oportunidade
+
+O usuario deve poder filtrar empresas por oportunidades acionaveis para presenca digital.
+
+Filtros iniciais:
+
+- No website detected;
+- New entity under 30 days;
+- Local business;
+- High confidence;
+- Contact detected.
+
+Os filtros devem ser combinaveis e devem alterar lista, contadores e exportacao. Cada filtro deve ser explicado na interface quando a confianca ou a fonte do sinal for limitada.
 
 ### RF05 - Atualizar fase ao longo do tempo
 
@@ -145,6 +170,10 @@ Campos minimos no CSV:
 - industry;
 - timing_stage;
 - timing_score;
+- website_status;
+- digital_presence_status;
+- contact_detected;
+- opportunity_filters;
 - source.
 
 ### RF08 - Copiar abordagem contextual
@@ -201,7 +230,7 @@ Sinais devem ajudar a entender relevancia, nao apenas enriquecer cadastro. Um si
 
 O Timing Score deve considerar o servico vendido pelo usuario.
 
-O mesmo negocio pode receber scores diferentes para website development, branding, SEO, paid marketing, social media marketing e e-commerce services.
+O mesmo negocio pode receber scores diferentes para website development, landing page creation, logo design, branding, local SEO e Google Business Profile/local presence.
 
 O score deve representar quao favoravel parece ser o momento atual para abordagem. Ele nao deve representar probabilidade de compra.
 

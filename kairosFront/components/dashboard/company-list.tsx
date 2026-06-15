@@ -6,6 +6,7 @@ import { CompanyFilters, type FilterState } from './company-filters'
 import { getTimingStageLabel, type TimingStage } from '@/lib/types'
 import {
   discoverKairosBusinesses,
+  listKairosWatchlist,
   listKairosBusinessPage,
   recalculateKairosTimingStages,
   toCompany,
@@ -30,6 +31,9 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
   const [isDiscovering, setIsDiscovering] = useState(false)
   const [isRecalculating, setIsRecalculating] = useState(false)
   const [pageOffset, setPageOffset] = useState(0)
+  const [savedBusinessIds, setSavedBusinessIds] = useState<ReadonlySet<string>>(
+    new Set(),
+  )
   const [totalCompanies, setTotalCompanies] = useState(0)
   const [offeredService, setOfferedService] = useState<OfferedService>(
     'website-design-development',
@@ -41,6 +45,7 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
     industry: 'all',
     timingStage: 'all',
     minScore: '',
+    opportunityFilters: [],
   })
   const deferredFilters = useDeferredValue(filters)
 
@@ -83,6 +88,9 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
   const pageEnd = Math.min(pageOffset + companies.length, totalCompanies)
   const hasPreviousPage = pageOffset > 0
   const hasNextPage = pageOffset + companies.length < totalCompanies
+  const handleCompanySaved = (businessId: string) => {
+    setSavedBusinessIds((current) => new Set([...current, businessId]))
+  }
 
   async function loadBusinesses(
     activeFilters: FilterState,
@@ -102,18 +110,23 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
     try {
       const marketTarget = readKairosMarketTargetSession()
       const selectedService = marketTarget?.offeredService ?? 'website-design-development'
-      const page = await listKairosBusinessPage(session.accessToken, {
-        city: activeFilters.city,
-        industry: activeFilters.industry,
-        limit: pageSize,
-        minScore: activeFilters.minScore,
-        offset,
-        search: activeFilters.search,
-        offeredService: selectedService,
-        state: activeFilters.state === 'all' ? undefined : activeFilters.state,
-        timingStage: activeFilters.timingStage as TimingStage | 'all',
-      })
+      const [page, watchlist] = await Promise.all([
+        listKairosBusinessPage(session.accessToken, {
+          city: activeFilters.city,
+          industry: activeFilters.industry,
+          limit: pageSize,
+          minScore: activeFilters.minScore,
+          offset,
+          opportunityFilters: activeFilters.opportunityFilters,
+          search: activeFilters.search,
+          offeredService: selectedService,
+          state: activeFilters.state === 'all' ? undefined : activeFilters.state,
+          timingStage: activeFilters.timingStage as TimingStage | 'all',
+        }),
+        listKairosWatchlist(session.account.id, session.accessToken),
+      ])
       setOfferedService(selectedService)
+      setSavedBusinessIds(new Set(watchlist.map((item) => item.businessId)))
       setCompanies(page.items.map(toCompany))
       setTotalCompanies(page.total)
     } catch (error) {
@@ -260,7 +273,9 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
                     <CompanyCard
                       key={company.id}
                       company={company}
+                      initiallySaved={savedBusinessIds.has(company.id)}
                       offeredService={offeredService}
+                      onSaved={handleCompanySaved}
                     />
                   ))}
                 </div>
@@ -284,7 +299,9 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
             <CompanyCard
               key={company.id}
               company={company}
+              initiallySaved={savedBusinessIds.has(company.id)}
               offeredService={offeredService}
+              onSaved={handleCompanySaved}
             />
           ))}
           <PaginationBar

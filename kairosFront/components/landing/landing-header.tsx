@@ -9,7 +9,7 @@ export function LandingHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 glass">
+    <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-white/90 backdrop-blur-md">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <nav className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
@@ -19,10 +19,9 @@ export function LandingHeader() {
             <span className="text-xl font-semibold text-foreground">Kairos</span>
           </div>
 
-          {/* Desktop Navigation */}
           <div className="hidden md:flex md:items-center md:gap-8">
             <Link href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Timing
+              Opportunity
             </Link>
             <Link href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               How it Works
@@ -31,10 +30,10 @@ export function LandingHeader() {
               Dashboard
             </Link>
             <Link href="#use-cases" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Use Cases
+              Niches
             </Link>
             <Link href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Pricing
+              Beta
             </Link>
           </div>
 
@@ -43,11 +42,10 @@ export function LandingHeader() {
               <Link href="/login">Log in</Link>
             </Button>
             <Button asChild>
-              <Link href="#pricing">Get early access</Link>
+              <Link href="/signup">Try now for free</Link>
             </Button>
           </div>
 
-          {/* Mobile Menu Button */}
           <button
             type="button"
             className="md:hidden p-2 rounded-md text-muted-foreground hover:text-foreground"
@@ -58,12 +56,11 @@ export function LandingHeader() {
           </button>
         </nav>
 
-        {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border">
+          <div className="md:hidden border-t border-border bg-white py-4">
             <div className="flex flex-col gap-4">
               <Link href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-                Timing
+                Opportunity
               </Link>
               <Link href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground">
                 How it Works
@@ -72,17 +69,17 @@ export function LandingHeader() {
                 Dashboard
               </Link>
               <Link href="#use-cases" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-                Use Cases
+                Niches
               </Link>
               <Link href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-                Pricing
+                Beta
               </Link>
               <div className="flex flex-col gap-2 pt-4 border-t border-border">
                 <Button variant="ghost" asChild className="justify-start">
                   <Link href="/login">Log in</Link>
                 </Button>
                 <Button asChild>
-                  <Link href="#pricing">Get early access</Link>
+                  <Link href="/signup">Try now for free</Link>
                 </Button>
               </div>
             </div>
