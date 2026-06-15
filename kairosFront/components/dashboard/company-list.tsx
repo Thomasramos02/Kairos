@@ -1,99 +1,109 @@
-'use client'
+"use client";
 
-import { useDeferredValue, useEffect, useMemo, useState } from 'react'
-import { CompanyCard } from './company-card'
-import { CompanyFilters, type FilterState } from './company-filters'
-import { getTimingStageLabel, type TimingStage } from '@/lib/types'
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { CompanyCard } from "./company-card";
+import { CompanyFilters, type FilterState } from "./company-filters";
+import { getTimingStageLabel, type TimingStage } from "@/lib/types";
 import {
   discoverKairosBusinesses,
   listKairosBusinessPage,
   recalculateKairosTimingStages,
   toCompany,
-} from '@/lib/business-api'
-import { getOrFetchAccount } from '@/lib/account-session'
-import { Building2, ChevronLeft, ChevronRight, Database, RefreshCw } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { readKairosMarketTargetSession } from '@/lib/market-target-session'
-import { OfferedService } from '@/lib/account-api'
-import { usStateOptions } from '@/lib/us-state-options'
+} from "@/lib/business-api";
+import { getOrFetchAccount } from "@/lib/account-session";
+import {
+  Building2,
+  ChevronLeft,
+  ChevronRight,
+  Database,
+  RefreshCw,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { readKairosMarketTargetSession } from "@/lib/market-target-session";
+import { OfferedService } from "@/lib/account-api";
+import { usStateOptions } from "@/lib/us-state-options";
 
 interface CompanyListProps {
-  groupByStage?: boolean
+  groupByStage?: boolean;
 }
 
-const pageSize = 24
+const pageSize = 24;
 
 export function CompanyList({ groupByStage = true }: CompanyListProps) {
-  const [companies, setCompanies] = useState<ReturnType<typeof toCompany>[]>([])
-  const [loadError, setLoadError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isDiscovering, setIsDiscovering] = useState(false)
-  const [isRecalculating, setIsRecalculating] = useState(false)
-  const [pageOffset, setPageOffset] = useState(0)
-  const [totalCompanies, setTotalCompanies] = useState(0)
+  const [companies, setCompanies] = useState<ReturnType<typeof toCompany>[]>(
+    [],
+  );
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isDiscovering, setIsDiscovering] = useState(false);
+  const [isRecalculating, setIsRecalculating] = useState(false);
+  const [pageOffset, setPageOffset] = useState(0);
+  const [totalCompanies, setTotalCompanies] = useState(0);
   const [offeredService, setOfferedService] = useState<OfferedService>(
-    'website-design-development',
-  )
+    "website-design-development",
+  );
   const [filters, setFilters] = useState<FilterState>({
-    search: '',
-    state: 'all',
-    city: '',
-    industry: 'all',
-    timingStage: 'all',
-    minScore: '',
-  })
-  const deferredFilters = useDeferredValue(filters)
+    search: "",
+    state: "all",
+    city: "",
+    industry: "all",
+    timingStage: "all",
+    minScore: "",
+    opportunityFilters: [],
+  });
+  const deferredFilters = useDeferredValue(filters);
 
   useEffect(() => {
-    setPageOffset(0)
-  }, [filters])
+    setPageOffset(0);
+  }, [filters]);
 
   useEffect(() => {
-    void loadBusinesses(deferredFilters, pageOffset)
-  }, [deferredFilters, pageOffset])
+    void loadBusinesses(deferredFilters, pageOffset);
+  }, [deferredFilters, pageOffset]);
 
   const groupedCompanies = useMemo(() => {
     if (!groupByStage) {
-      return null
+      return null;
     }
 
     const groups: Record<TimingStage, typeof companies> = {
-      'best-window': [],
-      'warming-up': [],
-      'too-early': [],
-      'cooling-down': [],
-      'old-lead': [],
-    }
+      "best-window": [],
+      "warming-up": [],
+      "too-early": [],
+      "cooling-down": [],
+      "old-lead": [],
+    };
 
     companies.forEach((company) => {
-      groups[company.timingStage].push(company)
-    })
+      groups[company.timingStage].push(company);
+    });
 
-    return groups
-  }, [companies, groupByStage])
+    return groups;
+  }, [companies, groupByStage]);
 
   const stageOrder: TimingStage[] = [
-    'best-window',
-    'warming-up',
-    'too-early',
-    'cooling-down',
-    'old-lead',
-  ]
-  const pageStart = totalCompanies === 0 ? 0 : pageOffset + 1
-  const pageEnd = Math.min(pageOffset + companies.length, totalCompanies)
-  const hasPreviousPage = pageOffset > 0
-  const hasNextPage = pageOffset + companies.length < totalCompanies
+    "best-window",
+    "warming-up",
+    "too-early",
+    "cooling-down",
+    "old-lead",
+  ];
+  const pageStart = totalCompanies === 0 ? 0 : pageOffset + 1;
+  const pageEnd = Math.min(pageOffset + companies.length, totalCompanies);
+  const hasPreviousPage = pageOffset > 0;
+  const hasNextPage = pageOffset + companies.length < totalCompanies;
 
   async function loadBusinesses(
     activeFilters: FilterState,
     offset: number,
   ): Promise<void> {
-    setIsLoading(true)
-    setLoadError(null)
+    setIsLoading(true);
+    setLoadError(null);
 
     try {
-      const marketTarget = readKairosMarketTargetSession()
-      const selectedService = marketTarget?.offeredService ?? 'website-design-development'
+      const marketTarget = readKairosMarketTargetSession();
+      const selectedService =
+        marketTarget?.offeredService ?? "website-design-development";
       const page = await listKairosBusinessPage({
         city: activeFilters.city,
         industry: activeFilters.industry,
@@ -102,47 +112,45 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
         offset,
         search: activeFilters.search,
         offeredService: selectedService,
-        state: activeFilters.state === 'all' ? undefined : activeFilters.state,
-        timingStage: activeFilters.timingStage as TimingStage | 'all',
-      })
-      setOfferedService(selectedService)
-      setCompanies(page.items.map(toCompany))
-      setTotalCompanies(page.total)
+        state: activeFilters.state === "all" ? undefined : activeFilters.state,
+        timingStage: activeFilters.timingStage as TimingStage | "all",
+      });
+      setOfferedService(selectedService);
+      setCompanies(page.items.map(toCompany));
+      setTotalCompanies(page.total);
     } catch (error) {
-      setLoadError(formatCompanyListError(error))
-      setCompanies([])
-      setTotalCompanies(0)
+      setLoadError(formatCompanyListError(error));
+      setCompanies([]);
+      setTotalCompanies(0);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
   async function handleRecalculate(): Promise<void> {
-    setIsRecalculating(true)
+    setIsRecalculating(true);
 
     try {
-      await recalculateKairosTimingStages(
-        resolveRecalculationState(filters),
-      )
-      await loadBusinesses(deferredFilters, pageOffset)
+      await recalculateKairosTimingStages(resolveRecalculationState(filters));
+      await loadBusinesses(deferredFilters, pageOffset);
     } catch (error) {
-      setLoadError(formatCompanyListError(error))
+      setLoadError(formatCompanyListError(error));
     } finally {
-      setIsRecalculating(false)
+      setIsRecalculating(false);
     }
   }
 
   async function handleDiscoverBusinesses(): Promise<void> {
-    setIsDiscovering(true)
-    setLoadError(null)
+    setIsDiscovering(true);
+    setLoadError(null);
 
     try {
-      await dispatchDiscoveryRequests(filters)
-      await loadBusinesses(deferredFilters, pageOffset)
+      await dispatchDiscoveryRequests(filters);
+      await loadBusinesses(deferredFilters, pageOffset);
     } catch (error) {
-      setLoadError(formatCompanyListError(error))
+      setLoadError(formatCompanyListError(error));
     } finally {
-      setIsDiscovering(false)
+      setIsDiscovering(false);
     }
   }
 
@@ -158,7 +166,7 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
             disabled={isDiscovering}
           >
             <Database className="h-4 w-4" />
-            {isDiscovering ? 'Sync queued...' : 'Sync state data'}
+            {isDiscovering ? "Sync queued..." : "Sync state data"}
           </Button>
           <Button
             variant="outline"
@@ -167,7 +175,7 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
             disabled={isRecalculating}
           >
             <RefreshCw className="h-4 w-4" />
-            {isRecalculating ? 'Queued...' : 'Recalculate timing'}
+            {isRecalculating ? "Queued..." : "Recalculate timing"}
           </Button>
         </div>
       </div>
@@ -183,7 +191,9 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
         hasPreviousPage={hasPreviousPage}
         isLoading={isLoading}
         onNextPage={() => setPageOffset((current) => current + pageSize)}
-        onPreviousPage={() => setPageOffset((current) => Math.max(0, current - pageSize))}
+        onPreviousPage={() =>
+          setPageOffset((current) => Math.max(0, current - pageSize))
+        }
         pageEnd={pageEnd}
         pageStart={pageStart}
         totalCompanies={totalCompanies}
@@ -204,16 +214,17 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
             No companies found for this market yet.
           </h3>
           <p className="mx-auto max-w-md text-muted-foreground">
-            Try expanding your city filter or check back after the next data refresh.
+            Try expanding your city filter or check back after the next data
+            refresh.
           </p>
         </div>
       ) : groupByStage && groupedCompanies ? (
         <div className="space-y-8">
           {stageOrder.map((stage) => {
-            const stageCompanies = groupedCompanies[stage]
+            const stageCompanies = groupedCompanies[stage];
 
             if (stageCompanies.length === 0) {
-              return null
+              return null;
             }
 
             return (
@@ -224,8 +235,8 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
                       {getTimingStageLabel(stage)}
                     </h2>
                     <span className="text-sm text-muted-foreground">
-                      {stageCompanies.length}{' '}
-                      {stageCompanies.length === 1 ? 'company' : 'companies'}
+                      {stageCompanies.length}{" "}
+                      {stageCompanies.length === 1 ? "company" : "companies"}
                     </span>
                   </div>
                   <span className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
@@ -242,14 +253,16 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
                   ))}
                 </div>
               </div>
-            )
+            );
           })}
           <PaginationBar
             hasNextPage={hasNextPage}
             hasPreviousPage={hasPreviousPage}
             isLoading={isLoading}
             onNextPage={() => setPageOffset((current) => current + pageSize)}
-            onPreviousPage={() => setPageOffset((current) => Math.max(0, current - pageSize))}
+            onPreviousPage={() =>
+              setPageOffset((current) => Math.max(0, current - pageSize))
+            }
             pageEnd={pageEnd}
             pageStart={pageStart}
             totalCompanies={totalCompanies}
@@ -269,7 +282,9 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
             hasPreviousPage={hasPreviousPage}
             isLoading={isLoading}
             onNextPage={() => setPageOffset((current) => current + pageSize)}
-            onPreviousPage={() => setPageOffset((current) => Math.max(0, current - pageSize))}
+            onPreviousPage={() =>
+              setPageOffset((current) => Math.max(0, current - pageSize))
+            }
             pageEnd={pageEnd}
             pageStart={pageStart}
             totalCompanies={totalCompanies}
@@ -277,7 +292,7 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
         </div>
       )}
     </div>
-  )
+  );
 }
 
 function PaginationBar({
@@ -290,14 +305,14 @@ function PaginationBar({
   pageStart,
   totalCompanies,
 }: {
-  hasNextPage: boolean
-  hasPreviousPage: boolean
-  isLoading: boolean
-  onNextPage: () => void
-  onPreviousPage: () => void
-  pageEnd: number
-  pageStart: number
-  totalCompanies: number
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  isLoading: boolean;
+  onNextPage: () => void;
+  onPreviousPage: () => void;
+  pageEnd: number;
+  pageStart: number;
+  totalCompanies: number;
 }) {
   return (
     <nav
@@ -335,50 +350,46 @@ function PaginationBar({
         </Button>
       </div>
     </nav>
-  )
+  );
 }
 
 function resolveRecalculationState(filters: FilterState): string | undefined {
-  if (filters.state !== 'all') {
-    return filters.state
+  if (filters.state !== "all") {
+    return filters.state;
   }
 
-  return readKairosMarketTargetSession()?.state
+  return readKairosMarketTargetSession()?.state;
 }
 
-async function dispatchDiscoveryRequests(
-  filters: FilterState,
-): Promise<void> {
-  const states = resolveDiscoveryStates(filters)
-  const industry = resolveDiscoveryIndustry(filters)
+async function dispatchDiscoveryRequests(filters: FilterState): Promise<void> {
+  const states = resolveDiscoveryStates(filters);
+  const industry = resolveDiscoveryIndustry(filters);
 
   await Promise.all(
-    states.map((state) =>
-      discoverKairosBusinesses({ industry, state }),
-    ),
-  )
+    states.map((state) => discoverKairosBusinesses({ industry, state })),
+  );
 }
 
 function resolveDiscoveryStates(filters: FilterState): readonly string[] {
-  if (filters.state !== 'all') {
-    return [filters.state]
+  if (filters.state !== "all") {
+    return [filters.state];
   }
 
-  return usStateOptions.map((state) => state.abbreviation)
+  return usStateOptions.map((state) => state.abbreviation);
 }
 
 function resolveDiscoveryIndustry(filters: FilterState): string {
-  if (filters.industry !== 'all') {
-    return filters.industry
+  if (filters.industry !== "all") {
+    return filters.industry;
   }
 
-  return readKairosMarketTargetSession()?.industry ?? 'all'
+  return readKairosMarketTargetSession()?.industry ?? "all";
 }
 
 function formatCompanyListError(error: unknown): string {
   if (error instanceof Error) {
-    return error.message
+    return error.message;
   }
 
-  return 'Unable to load businesses: received unknown error; expected Kairos API response'
+  return "Unable to load businesses: received unknown error; expected Kairos API response";
 }
