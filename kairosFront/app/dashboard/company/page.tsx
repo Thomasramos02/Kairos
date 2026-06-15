@@ -35,7 +35,7 @@ import {
   TimingStageHistoryEntry,
   toCompany,
 } from "@/lib/business-api";
-import { readKairosAccountSession } from "@/lib/account-session";
+import { getOrFetchAccount } from "@/lib/account-session";
 import {
   buildCompanyScoreMetrics,
   buildRecommendationContext,
@@ -87,19 +87,12 @@ function CompanyDetailContent() {
   }, [company?.id]);
 
   const loadCompanyDetail = async (businessId: string) => {
-    const session = readKairosAccountSession();
-
-    if (session === null) {
-      setLoadError("Sign in again to load this company.");
-      return;
-    }
-
     try {
       const [business, stageHistory] = await Promise.all([
-        getKairosBusiness(session.accessToken, businessId, {
+        getKairosBusiness(businessId, {
           offeredService: resolveConfiguredOfferedService(),
         }),
-        listKairosTimingHistory(session.accessToken, businessId),
+        listKairosTimingHistory(businessId),
       ]);
       setCompany(toCompany(business));
       setHistory(stageHistory);
@@ -122,17 +115,16 @@ function CompanyDetailContent() {
   };
 
   const handleSave = async () => {
-    const session = readKairosAccountSession();
+    const account = await getOrFetchAccount();
 
-    if (session === null || company === null) {
+    if (account === null || company === null) {
       setLoadError("Sign in again to save this company.");
       return;
     }
 
     try {
       await saveKairosWatchlistItem(
-        session.account.id,
-        session.accessToken,
+        account.id,
         company.id,
       );
       setSaved(true);
@@ -144,16 +136,7 @@ function CompanyDetailContent() {
   const loadOutreachMessage = async (
     selectedCompany: Company,
   ): Promise<string> => {
-    const session = readKairosAccountSession();
-
-    if (session === null) {
-      throw new Error(
-        "Unable to create outreach: expected authenticated account session.",
-      );
-    }
-
     const suggestion = await createKairosOutreachSuggestion(
-      session.accessToken,
       selectedCompany,
       resolveConfiguredOfferedService(),
     );

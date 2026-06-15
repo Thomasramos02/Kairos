@@ -15,8 +15,11 @@ export class AlertDeliveryService {
     private readonly telegramSender: TelegramAlertChannelSender,
   ) {}
 
-  async deliverAlert(alertEvent: AlertEvent): Promise<readonly AlertDeliveryResult[]> {
-    const message = buildAlertDeliveryMessage(alertEvent);
+  async deliverAlert(
+    alertEvent: AlertEvent,
+    businessName: string,
+  ): Promise<readonly AlertDeliveryResult[]> {
+    const message = buildAlertDeliveryMessage(alertEvent, businessName);
     const senders = this.listRequestedSenders(alertEvent);
 
     return await Promise.all(

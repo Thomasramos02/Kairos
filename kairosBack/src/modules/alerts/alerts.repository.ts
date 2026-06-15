@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import { createInMemoryId } from '../../common/in-memory-id';
 import { DRIZZLE_DATABASE } from '../../database/database.tokens';
 import { DrizzleDatabase } from '../../database/drizzle.provider';
@@ -17,6 +17,7 @@ export class AlertsRepository {
     accountId: string,
     businessId: string,
     reason: AlertReason,
+    channels: readonly ('email' | 'telegram')[],
   ): Promise<AlertEvent> {
     const [alertEvent] = await this.database
       .insert(alertEvents)
@@ -25,10 +26,9 @@ export class AlertsRepository {
         accountId,
         businessId,
         reason,
-        channels: ['email', 'telegram'],
+        channels,
       })
       .returning();
-
     return toAlertEvent(alertEvent);
   }
 
@@ -36,9 +36,38 @@ export class AlertsRepository {
     const rows = await this.database
       .select()
       .from(alertEvents)
-      .where(eq(alertEvents.accountId, accountId));
+      .where(eq(alertEvents.accountId, accountId))
+      .orderBy(alertEvents.createdAt);
 
     return rows.map(toAlertEvent);
+  }
+
+  async markAsRead(id: string): Promise<AlertEvent> {
+    const [alertEvent] = await this.database
+      .update(alertEvents)
+      .set({ readAt: new Date() })
+      .where(eq(alertEvents.id, id))
+      .returning();
+
+    return toAlertEvent(alertEvent);
+  }
+
+  async delete(id: string): Promise<AlertEvent> {
+    const [alertEvent] = await this.database
+      .delete(alertEvents)
+      .where(eq(alertEvents.id, id))
+      .returning();
+
+    return toAlertEvent(alertEvent);
+  }
+
+  async countUnreadByAccount(accountId: string): Promise<number> {
+    const rows = await this.database
+      .select()
+      .from(alertEvents)
+      .where(and(eq(alertEvents.accountId, accountId), isNull(alertEvents.readAt)));
+
+    return rows.length;
   }
 }
 
@@ -49,6 +78,7 @@ function toAlertEvent(row: typeof alertEvents.$inferSelect): AlertEvent {
     businessId: row.businessId,
     reason: row.reason as AlertReason,
     channels: row.channels as readonly ('email' | 'telegram')[],
+    readAt: row.readAt?.toISOString() ?? null,
     createdAt: row.createdAt.toISOString(),
   };
 }

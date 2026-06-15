@@ -23,6 +23,10 @@ export class AccountsService {
     private readonly jwtTokenService: JwtTokenService,
   ) {}
 
+  async findById(accountId: string): Promise<PublicAccount> {
+    return await this.accountsRepository.findById(accountId);
+  }
+
   async registerAccount(request: RegisterAccountRequest): Promise<PublicAccount> {
     assertRegisterAccountRequest(request);
 

@@ -18,7 +18,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { OfferedService } from "@/lib/account-api";
-import { readKairosAccountSession } from "@/lib/account-session";
+import { getOrFetchAccount } from "@/lib/account-session";
 import {
   createKairosOutreachSuggestion,
   saveKairosWatchlistItem,
@@ -60,16 +60,8 @@ export function CompanyCard({
   }, [initiallySaved]);
 
   const handleCopyOutreach = async () => {
-    const session = readKairosAccountSession();
-
-    if (session === null) {
-      setSaveError("Sign in again to copy a suggested outreach message.");
-      return;
-    }
-
     try {
       const suggestion = await createKairosOutreachSuggestion(
-        session.accessToken,
         company,
         offeredService,
       );
@@ -83,9 +75,9 @@ export function CompanyCard({
   };
 
   const handleSaveToWatchlist = async () => {
-    const session = readKairosAccountSession();
+    const account = await getOrFetchAccount();
 
-    if (session === null) {
+    if (account === null) {
       setSaveError("Sign in again to save this company.");
       return;
     }
@@ -94,8 +86,7 @@ export function CompanyCard({
 
     try {
       await saveKairosWatchlistItem(
-        session.account.id,
-        session.accessToken,
+        account.id,
         company.id,
       );
       setSaved(true);

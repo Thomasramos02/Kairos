@@ -5,7 +5,7 @@ import { Check, Download, FileSpreadsheet } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { exportKairosWatchlistCsv } from "@/lib/business-api";
-import { readKairosAccountSession } from "@/lib/account-session";
+import { getOrFetchAccount } from "@/lib/account-session";
 
 const exportFields = [
   { id: "id", label: "Business ID", checked: true },
@@ -38,9 +38,9 @@ export default function ExportsPage() {
   const [exported, setExported] = useState(false);
 
   const handleExport = async () => {
-    const session = readKairosAccountSession();
+    const account = await getOrFetchAccount();
 
-    if (session === null) {
+    if (account === null) {
       setExportError("Sign in again to export watchlist businesses.");
       return;
     }
@@ -49,10 +49,7 @@ export default function ExportsPage() {
     setExportError(null);
 
     try {
-      const response = await exportKairosWatchlistCsv(
-        session.account.id,
-        session.accessToken,
-      );
+      const response = await exportKairosWatchlistCsv(account.id);
       downloadCsv(response.fileName, response.csv, response.contentType);
       setExported(true);
       window.setTimeout(() => setExported(false), 2000);

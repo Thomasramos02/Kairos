@@ -1,4 +1,6 @@
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+<<<<<<< HEAD
 import Link from 'next/link'
 import { ArrowRight, Check, Clock, Search, ShieldCheck, Sparkles, Target } from 'lucide-react'
 
@@ -10,6 +12,10 @@ const opportunityFilters = [
   'Contact detected',
 ]
 
+=======
+import { ArrowRight, Clock, ShieldCheck, Sparkles, Target } from 'lucide-react'
+
+>>>>>>> 0cc7802447f0cee6ce7d46558eb5bd52beafc943
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden border-b border-border bg-[linear-gradient(180deg,#F7F9FC_0%,#EEF6FB_55%,#FFFFFF_100%)] pt-28 pb-16 lg:pt-32 lg:pb-20">
@@ -31,6 +37,7 @@ export function HeroSection() {
               public contacts, and fresh timing signals.
             </p>
 
+<<<<<<< HEAD
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row lg:items-start">
               <Button size="lg" className="h-11 gap-2" asChild>
                 <Link href="/signup">
@@ -41,10 +48,23 @@ export function HeroSection() {
               <Button size="lg" variant="outline" className="h-11 gap-2 bg-white" asChild>
                 <Link href="/dashboard">
                   View demo
+=======
+            <div className="mt-8 flex flex-col sm:flex-row gap-3">
+              <Button size="lg" className="h-11 gap-2" asChild>
+                <Link href="/signup">
+                  Try Kairos Beta
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" className="h-11" asChild>
+                <Link href="/dashboard">
+                  View Dashboard
+>>>>>>> 0cc7802447f0cee6ce7d46558eb5bd52beafc943
                 </Link>
               </Button>
             </div>
 
+<<<<<<< HEAD
             <div className="mt-5 flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm text-muted-foreground lg:justify-start">
               {['No credit card', 'Connecticut active coverage', 'Built for focused outreach'].map((item) => (
                 <span key={item} className="inline-flex items-center gap-1.5">
@@ -53,6 +73,11 @@ export function HeroSection() {
                 </span>
               ))}
             </div>
+=======
+            <p className="mt-4 text-sm text-muted-foreground">
+              Connecticut active coverage. Free during beta — no credit card required.
+            </p>
+>>>>>>> 0cc7802447f0cee6ce7d46558eb5bd52beafc943
 
             <div className="mt-8 grid gap-3 text-left sm:grid-cols-3">
               {[

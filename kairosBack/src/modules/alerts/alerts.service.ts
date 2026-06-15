@@ -1,4 +1,5 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { AccountsService } from '../accounts/accounts.service';
 import { CreateAlertRequest } from './dto/alert.dto';
 import { AlertsRepository } from './alerts.repository';
 import { AlertEvent } from './models/alert.model';
@@ -9,23 +10,51 @@ export class AlertsService {
   constructor(
     private readonly alertsRepository: AlertsRepository,
     private readonly alertDeliveryService: AlertDeliveryService,
+    private readonly accountsService: AccountsService,
   ) {}
 
   async createAlert(request: CreateAlertRequest): Promise<AlertEvent> {
     assertAlertRequest(request);
-
+    const account = await this.accountsService.findById(request.accountId);
+    const channels = resolveRequestedChannels(account.alertPreference.channels);
     const alertEvent = await this.alertsRepository.createAlert(
       request.accountId,
       request.businessId,
       request.reason,
+      channels,
     );
-    await this.alertDeliveryService.deliverAlert(alertEvent);
-
+    const businessName = request.businessName ?? 'Unknown business';
+    await this.alertDeliveryService.deliverAlert(alertEvent, businessName);
     return alertEvent;
   }
 
   async listByAccount(accountId: string): Promise<readonly AlertEvent[]> {
     return await this.alertsRepository.listByAccount(accountId);
+  }
+
+  async markAsRead(id: string): Promise<AlertEvent> {
+    return await assertAlertExistsAndReturn(id, this.alertsRepository.markAsRead(id));
+  }
+
+  async delete(id: string): Promise<AlertEvent> {
+    return await assertAlertExistsAndReturn(id, this.alertsRepository.delete(id));
+  }
+
+  async countUnreadByAccount(accountId: string): Promise<number> {
+    return await this.alertsRepository.countUnreadByAccount(accountId);
+  }
+}
+
+async function assertAlertExistsAndReturn(
+  id: string,
+  action: Promise<AlertEvent>,
+): Promise<AlertEvent> {
+  try {
+    return await action;
+  } catch {
+    throw new NotFoundException(
+      `Alert not found: received id "${id}"; expected an existing alert`,
+    );
   }
 }
 
@@ -35,4 +64,14 @@ function assertAlertRequest(request: CreateAlertRequest): void {
       `Invalid alert request: received accountId "${request.accountId}" and businessId "${request.businessId}"; expected non-empty ids`,
     );
   }
+}
+
+function resolveRequestedChannels(
+  preferenceChannels: readonly ('email' | 'telegram')[],
+): readonly ('email' | 'telegram')[] {
+  if (preferenceChannels.length === 0) {
+    return ['email'];
+  }
+
+  return preferenceChannels;
 }

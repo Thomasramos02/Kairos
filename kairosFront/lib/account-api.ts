@@ -64,8 +64,8 @@ const kairosApiBaseUrl = readKairosApiBaseUrl(readBrowserSafeEnvironment())
 
 export async function registerKairosAccount(
   payload: RegisterAccountPayload,
-): Promise<PublicAccount> {
-  return await requestKairosApi<PublicAccount>('/auth/register', {
+): Promise<LoginAccountResponse> {
+  return await requestKairosApi<LoginAccountResponse>('/auth/register', {
     body: payload,
     method: 'POST',
   })
@@ -81,40 +81,80 @@ export async function loginKairosAccount(
   })
 }
 
+export async function fetchKairosMe(): Promise<PublicAccount> {
+  return await requestKairosApi<PublicAccount>('/auth/me', {
+    method: 'GET',
+  })
+}
+
 export async function updateKairosAccount(
   accountId: string,
-  accessToken: string,
   payload: UpdateAccountPayload,
 ): Promise<PublicAccount> {
   return await requestKairosApi<PublicAccount>(`/accounts/${accountId}`, {
-    accessToken,
     body: payload,
     method: 'PATCH',
   })
 }
 
 export async function createKairosMarketTarget(
-  accessToken: string,
   payload: CreateMarketTargetPayload,
 ): Promise<MarketTarget> {
   return await requestKairosApi<MarketTarget>('/market-targets', {
-    accessToken,
     body: payload,
     method: 'POST',
   })
 }
 
+const kairosAccessTokenKey = 'kairos.accessToken'
+
+let cachedAccessToken: string | null = tryReadAccessTokenFromStorage()
+
+function tryReadAccessTokenFromStorage(): string | null {
+  try {
+    if (typeof window !== 'undefined') {
+      return window.localStorage.getItem(kairosAccessTokenKey)
+    }
+  } catch {
+    return null
+  }
+
+  return null
+}
+
+export function setAccessToken(token: string | null): void {
+  cachedAccessToken = token
+
+  try {
+    if (typeof window !== 'undefined') {
+      if (token === null) {
+        window.localStorage.removeItem(kairosAccessTokenKey)
+      } else {
+        window.localStorage.setItem(kairosAccessTokenKey, token)
+      }
+    }
+  } catch {
+    /* storage unavailable */
+  }
+}
+
 export async function requestKairosApi<ResponseBody>(
   path: string,
   options: {
-    readonly accessToken?: string
     readonly body?: object
     readonly method: 'DELETE' | 'GET' | 'PATCH' | 'POST'
   },
 ): Promise<ResponseBody> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+
+  if (cachedAccessToken !== null) {
+    headers['Authorization'] = `Bearer ${cachedAccessToken}`
+  }
+
   const response = await fetch(`${kairosApiBaseUrl}${path}`, {
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
-    headers: buildKairosHeaders(options.accessToken),
+    headers,
+    credentials: 'include',
     method: options.method,
   })
 
@@ -123,17 +163,6 @@ export async function requestKairosApi<ResponseBody>(
   }
 
   return (await response.json()) as ResponseBody
-}
-
-export function buildKairosHeaders(accessToken: string | undefined): HeadersInit {
-  if (accessToken === undefined) {
-    return { 'Content-Type': 'application/json' }
-  }
-
-  return {
-    Authorization: `Bearer ${accessToken}`,
-    'Content-Type': 'application/json',
-  }
 }
 
 async function buildKairosApiError(

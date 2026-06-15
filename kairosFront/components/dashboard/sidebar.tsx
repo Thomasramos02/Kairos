@@ -14,8 +14,10 @@ import {
   Menu,
   X,
 } from 'lucide-react'
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
+import { useEffect, useState } from 'react'
+import { getOrFetchAccount, clearCachedAccount } from '@/lib/account-session'
+import { countUnreadAlerts } from '@/lib/business-api'
+import { PublicAccount, setAccessToken } from '@/lib/account-api'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -29,10 +31,39 @@ const navigation = [
 export function DashboardSidebar() {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [account, setAccount] = useState<PublicAccount | null>(null)
+  const [unreadCount, setUnreadCount] = useState(0)
+
+  useEffect(() => {
+    getOrFetchAccount().then((acc) => {
+      if (acc !== null) {
+        setAccount(acc)
+        countUnreadAlerts(acc.id)
+          .then(setUnreadCount)
+          .catch(() => {})
+      }
+    })
+  }, [])
+
+  const handleSignOut = () => {
+    clearCachedAccount()
+    setAccessToken(null)
+  }
+
+  const initials = account !== null
+    ? account.name
+        .split(' ')
+        .map((part) => part[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    : '??'
+
+  const displayName = account?.name ?? 'Unknown'
+  const displayEmail = account?.email ?? ''
 
   return (
     <>
-      {/* Mobile Menu Button */}
       <button
         type="button"
         className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg glass"
@@ -42,7 +73,6 @@ export function DashboardSidebar() {
         {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </button>
 
-      {/* Mobile Overlay */}
       {mobileOpen && (
         <div
           className="lg:hidden fixed inset-0 bg-black/20 z-40"
@@ -50,7 +80,6 @@ export function DashboardSidebar() {
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={cn(
           'fixed top-0 left-0 z-40 h-screen w-64 glass border-r border-border transition-transform duration-200',
@@ -58,7 +87,6 @@ export function DashboardSidebar() {
         )}
       >
         <div className="flex flex-col h-full">
-          {/* Logo */}
           <div className="flex items-center gap-2 h-16 px-6 border-b border-border">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
               <span className="text-lg font-bold text-primary-foreground">K</span>
@@ -66,7 +94,6 @@ export function DashboardSidebar() {
             <span className="text-xl font-semibold text-foreground">Kairos</span>
           </div>
 
-          {/* Navigation */}
           <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
             {navigation.map((item) => {
               const isActive =
@@ -79,7 +106,7 @@ export function DashboardSidebar() {
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
                   className={cn(
-                    'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                    'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors relative',
                     isActive
                       ? 'bg-primary text-primary-foreground'
                       : 'text-muted-foreground hover:text-foreground hover:bg-muted'
@@ -87,32 +114,34 @@ export function DashboardSidebar() {
                 >
                   <item.icon className="h-5 w-5" />
                   {item.name}
+                  {item.name === 'Alerts' && unreadCount > 0 && (
+                    <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground px-1">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
                 </Link>
               )
             })}
           </nav>
 
-          {/* User Section */}
           <div className="p-4 border-t border-border">
             <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-muted/50">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium">
-                JS
+                {initials}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">John Smith</p>
-                <p className="text-xs text-muted-foreground truncate">john@company.com</p>
+                <p className="text-sm font-medium text-foreground truncate">{displayName}</p>
+                <p className="text-xs text-muted-foreground truncate">{displayEmail}</p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              className="w-full mt-2 justify-start text-muted-foreground hover:text-foreground"
-              asChild
+            <Link
+              href="/"
+              onClick={handleSignOut}
+              className="w-full mt-2 flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
-              <Link href="/">
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign out
-              </Link>
-            </Button>
+              <LogOut className="h-4 w-4" />
+              Sign out
+            </Link>
           </div>
         </div>
       </aside>

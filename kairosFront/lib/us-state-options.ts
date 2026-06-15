@@ -16,14 +16,14 @@ export const usStateOptions: readonly UsStateOption[] = [
   },
   {
     abbreviation: 'RI',
-    caution: 'Promising NAICS/purpose coverage; source integration is not active yet.',
-    coverageStatus: 'next',
+    caution: null,
+    coverageStatus: 'active',
     name: 'Rhode Island',
   },
   {
     abbreviation: 'FL',
-    caution: 'High formation volume, but industry is inferred by Kairos instead of supplied by Sunbiz.',
-    coverageStatus: 'experimental',
+    caution: null,
+    coverageStatus: 'next',
     name: 'Florida',
   },
   {

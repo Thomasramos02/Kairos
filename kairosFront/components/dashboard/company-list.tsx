@@ -11,7 +11,7 @@ import {
   recalculateKairosTimingStages,
   toCompany,
 } from '@/lib/business-api'
-import { readKairosAccountSession } from '@/lib/account-session'
+import { getOrFetchAccount } from '@/lib/account-session'
 import { Building2, ChevronLeft, ChevronRight, Database, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { readKairosMarketTargetSession } from '@/lib/market-target-session'
@@ -96,20 +96,13 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
     activeFilters: FilterState,
     offset: number,
   ): Promise<void> {
-    const session = readKairosAccountSession()
-
-    if (session === null) {
-      setLoadError('Sign in again to load businesses.')
-      setIsLoading(false)
-      return
-    }
-
     setIsLoading(true)
     setLoadError(null)
 
     try {
       const marketTarget = readKairosMarketTargetSession()
       const selectedService = marketTarget?.offeredService ?? 'website-design-development'
+<<<<<<< HEAD
       const [page, watchlist] = await Promise.all([
         listKairosBusinessPage(session.accessToken, {
           city: activeFilters.city,
@@ -125,6 +118,19 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
         }),
         listKairosWatchlist(session.account.id, session.accessToken),
       ])
+=======
+      const page = await listKairosBusinessPage({
+        city: activeFilters.city,
+        industry: activeFilters.industry,
+        limit: pageSize,
+        minScore: activeFilters.minScore,
+        offset,
+        search: activeFilters.search,
+        offeredService: selectedService,
+        state: activeFilters.state === 'all' ? undefined : activeFilters.state,
+        timingStage: activeFilters.timingStage as TimingStage | 'all',
+      })
+>>>>>>> 0cc7802447f0cee6ce7d46558eb5bd52beafc943
       setOfferedService(selectedService)
       setSavedBusinessIds(new Set(watchlist.map((item) => item.businessId)))
       setCompanies(page.items.map(toCompany))
@@ -139,18 +145,10 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
   }
 
   async function handleRecalculate(): Promise<void> {
-    const session = readKairosAccountSession()
-
-    if (session === null) {
-      setLoadError('Sign in again to recalculate timing stages.')
-      return
-    }
-
     setIsRecalculating(true)
 
     try {
       await recalculateKairosTimingStages(
-        session.accessToken,
         resolveRecalculationState(filters),
       )
       await loadBusinesses(deferredFilters, pageOffset)
@@ -162,18 +160,11 @@ export function CompanyList({ groupByStage = true }: CompanyListProps) {
   }
 
   async function handleDiscoverBusinesses(): Promise<void> {
-    const session = readKairosAccountSession()
-
-    if (session === null) {
-      setLoadError('Sign in again to sync state data.')
-      return
-    }
-
     setIsDiscovering(true)
     setLoadError(null)
 
     try {
-      await dispatchDiscoveryRequests(session.accessToken, filters)
+      await dispatchDiscoveryRequests(filters)
       await loadBusinesses(deferredFilters, pageOffset)
     } catch (error) {
       setLoadError(formatCompanyListError(error))
@@ -387,7 +378,6 @@ function resolveRecalculationState(filters: FilterState): string | undefined {
 }
 
 async function dispatchDiscoveryRequests(
-  accessToken: string,
   filters: FilterState,
 ): Promise<void> {
   const states = resolveDiscoveryStates(filters)
@@ -395,7 +385,7 @@ async function dispatchDiscoveryRequests(
 
   await Promise.all(
     states.map((state) =>
-      discoverKairosBusinesses(accessToken, { industry, state }),
+      discoverKairosBusinesses({ industry, state }),
     ),
   )
 }

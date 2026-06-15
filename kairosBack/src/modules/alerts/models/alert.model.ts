@@ -9,5 +9,6 @@ export type AlertEvent = {
   readonly businessId: string;
   readonly reason: AlertReason;
   readonly channels: readonly ('email' | 'telegram')[];
+  readonly readAt: string | null;
   readonly createdAt: string;
 };

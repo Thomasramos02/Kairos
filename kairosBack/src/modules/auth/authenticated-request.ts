@@ -5,6 +5,7 @@ export type AuthenticatedRequest = {
 
 export type MutableAuthenticatedRequest = {
   readonly headers: Record<string, string | string[] | undefined>;
+  readonly cookies: Record<string, string>;
   user?: AuthenticatedUser;
 };
 

@@ -12,5 +12,6 @@ export const alertEvents = pgTable('alert_events', {
     .references(() => businesses.id),
   reason: varchar('reason', { length: 80 }).notNull(),
   channels: jsonb('channels').notNull(),
+  readAt: timestamp('read_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { BadgeCheck, Building2, FileText } from 'lucide-react'
 
-import { readKairosAccountSession } from '@/lib/account-session'
+import { getOrFetchAccount } from '@/lib/account-session'
 import { enrichKairosIndustryByCompanyId } from '@/lib/business-api'
 import { CorporateIndustryEnrichment } from '@/lib/types'
 
@@ -38,18 +38,11 @@ export function CompanyIndustryEnrichment({
     targetState: string,
     registryId: string,
   ): Promise<void> {
-    const session = readKairosAccountSession()
-
-    if (session === null) {
-      setLoadError('Sign in again to load official industry details.')
-      return
-    }
-
     setIsLoading(true)
     setLoadError(null)
 
     try {
-      setEnrichment(await enrichKairosIndustryByCompanyId(session.accessToken, targetState, registryId))
+      setEnrichment(await enrichKairosIndustryByCompanyId(targetState, registryId))
     } catch (error) {
       setLoadError(formatIndustryEnrichmentError(error))
     } finally {

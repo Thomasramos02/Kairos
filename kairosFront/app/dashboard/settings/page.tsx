@@ -23,11 +23,7 @@ import {
   OfferedService,
   updateKairosAccount,
 } from '@/lib/account-api'
-import {
-  KairosAccountSession,
-  readKairosAccountSession,
-  updateKairosAccountSession,
-} from '@/lib/account-session'
+import { getOrFetchAccount, setCachedAccount } from '@/lib/account-session'
 import {
   readKairosMarketTargetSession,
   saveKairosMarketTargetSession,
@@ -69,7 +65,7 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
-  const [accountSession, setAccountSession] = useState<KairosAccountSession | null>(null)
+  const [accountDataId, setAccountDataId] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<SettingsTab>('account')
   const [accountData, setAccountData] = useState({
     name: '',
@@ -94,26 +90,26 @@ export default function SettingsPage() {
   })
 
   useEffect(() => {
-    const session = readKairosAccountSession()
+    getOrFetchAccount().then((account) => {
+      if (account === null) {
+        router.push('/login')
+        return
+      }
 
-    if (session === null) {
-      router.push('/login')
-      return
-    }
-
-    setAccountSession(session)
-    setAccountData({
-      companyName: session.account.companyName ?? '',
-      email: session.account.email,
-      name: session.account.name,
+      setAccountDataId(account.id)
+      setAccountData({
+        companyName: account.companyName ?? '',
+        email: account.email,
+        name: account.name,
+      })
+      setAlertData((current) => ({
+        ...current,
+        email: account.alertPreference.channels.includes('email'),
+        frequency: account.alertPreference.frequency,
+        telegram: account.alertPreference.channels.includes('telegram'),
+      }))
+      hydrateMarketTargetData()
     })
-    setAlertData((current) => ({
-      ...current,
-      email: session.account.alertPreference.channels.includes('email'),
-      frequency: session.account.alertPreference.frequency,
-      telegram: session.account.alertPreference.channels.includes('telegram'),
-    }))
-    hydrateMarketTargetData()
   }, [router])
 
   const handleSave = async () => {
@@ -124,7 +120,7 @@ export default function SettingsPage() {
       return
     }
 
-    if (accountSession === null) {
+    if (accountDataId === null) {
       setSaveError('Unable to save settings: received empty session; expected authenticated account')
       return
     }
@@ -132,7 +128,7 @@ export default function SettingsPage() {
     setIsSaving(true)
 
     try {
-      await saveActiveSettings(accountSession)
+      await saveActiveSettings(accountDataId)
       showSavedState()
     } catch (error) {
       setSaveError(formatSettingsError(error))
@@ -158,19 +154,18 @@ export default function SettingsPage() {
     })
   }
 
-  const saveActiveSettings = async (session: KairosAccountSession) => {
+  const saveActiveSettings = async (id: string) => {
     if (activeTab === 'market') {
-      await saveMarketSettings(session, marketData)
+      await saveMarketSettings(id, marketData)
       return
     }
 
-    await saveAccountSettings(session)
+    await saveAccountSettings(id)
   }
 
-  const saveAccountSettings = async (session: KairosAccountSession) => {
+  const saveAccountSettings = async (id: string) => {
     const account = await updateKairosAccount(
-      session.account.id,
-      session.accessToken,
+      id,
       {
         alertChannels: buildAlertChannels(alertData),
         alertFrequency: alertData.frequency,
@@ -179,7 +174,7 @@ export default function SettingsPage() {
       },
     )
 
-    setAccountSession(updateKairosAccountSession(account))
+    setCachedAccount(account)
     setAccountData({
       companyName: account.companyName ?? '',
       email: account.email,
@@ -424,7 +419,7 @@ function SettingsCard({
 }
 
 async function saveMarketSettings(
-  session: KairosAccountSession,
+  accountId: string,
   marketData: {
     readonly city: string
     readonly customerType: string
@@ -434,14 +429,13 @@ async function saveMarketSettings(
   },
 ): Promise<void> {
   const marketTarget = await createKairosMarketTarget(
-    session.accessToken,
-    buildMarketTargetPayload(session, marketData),
+    buildMarketTargetPayload(accountId, marketData),
   )
   saveKairosMarketTargetSession(marketTarget)
 }
 
 function buildMarketTargetPayload(
-  session: KairosAccountSession,
+  accountId: string,
   marketData: {
     readonly city: string
     readonly customerType: string
@@ -457,7 +451,7 @@ function buildMarketTargetPayload(
   }
 
   return {
-    accountId: session.account.id,
+    accountId: accountId,
     cityOrRegion: marketData.city.trim() || undefined,
     country: 'US',
     desiredCustomerType: marketData.customerType,

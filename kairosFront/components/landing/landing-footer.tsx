@@ -22,8 +22,13 @@ export function LandingFooter() {
             <h4 className="font-semibold text-foreground mb-4">Product</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Features
+                <Link href="#why-timing" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Why Timing
+                </Link>
+              </li>
+              <li>
+                <Link href="#timing-stages" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Stages
                 </Link>
               </li>
               <li>
@@ -32,6 +37,7 @@ export function LandingFooter() {
                 </Link>
               </li>
               <li>
+<<<<<<< HEAD
                 <Link href="#use-cases" className="text-muted-foreground hover:text-foreground transition-colors">
                   Niches
                 </Link>
@@ -39,6 +45,10 @@ export function LandingFooter() {
               <li>
                 <Link href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">
                   Beta
+=======
+                <Link href="#cta" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Get Started
+>>>>>>> 0cc7802447f0cee6ce7d46558eb5bd52beafc943
                 </Link>
               </li>
             </ul>
